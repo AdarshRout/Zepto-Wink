@@ -675,6 +675,29 @@
     }
     #btn-recalibrate:hover { color: rgba(255,255,255,0.9); }
 
+    /* ── Calibration bonus tip ── */
+    #calib-tip {
+      margin-top: 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 200, 0, 0.10);
+      border: 1px solid rgba(255, 200, 0, 0.35);
+      border-radius: 999px;
+      padding: 5px 14px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: rgba(255, 220, 80, 0.95);
+      letter-spacing: 0.4px;
+      text-align: center;
+      animation: tipPulse 2s ease-in-out infinite;
+      box-shadow: 0 0 12px rgba(255,200,0,0.15);
+    }
+    @keyframes tipPulse {
+      0%,100% { opacity: 0.75; transform: scale(1);    box-shadow: 0 0 8px  rgba(255,200,0,0.12); }
+      50%      { opacity: 1;    transform: scale(1.03); box-shadow: 0 0 18px rgba(255,200,0,0.30); }
+    }
+
     /* ── Wink eye animation (welcome screen) ── */
     .wink-eyes { display:flex; gap:18px; align-items:center; justify-content:center; margin-bottom:4px; }
     .wink-eye {
@@ -922,6 +945,9 @@
 
         <!-- Skip -->
         <button id="calib-skip" onclick="skipCalibration()">Skip calibration</button>
+
+        <!-- Bonus tip -->
+        <div id="calib-tip">📸 Move Closer to the Cam for better accuracy</div>
       </div>
       <!-- ── End Calibration Overlay ── -->
     </div>
