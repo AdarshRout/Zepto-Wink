@@ -39,7 +39,7 @@ window.userProfile = {
 function _dom(id) { return document.getElementById(id); }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
-function _sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function _calibSleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 function _setCalibDot(activeIdx) {
   for (let i = 0; i < 3; i++) {
@@ -100,7 +100,7 @@ function _runCalibPhase(stepIdx, phaseId) {
 
     // Reset ring
     if (fill) {
-      fill.className = 'calib-ring-fill';
+      fill.setAttribute('class', 'calib-ring-fill');
       fill.style.transition = 'none';
       fill.style.strokeDashoffset = RING_CIRC;
     }
@@ -193,16 +193,16 @@ async function startCalibration() {
   // Success feedback
   _setCalibStatus('✅ Calibration complete!', 'success');
   const fill = _dom('calib-ring-fill');
-  if (fill) { fill.className = 'calib-ring-fill success'; fill.style.strokeDashoffset = 0; }
+  if (fill) { fill.setAttribute('class', 'calib-ring-fill success'); fill.style.strokeDashoffset = 0; }
   for (let i = 0; i < 3; i++) {
     const dot = _dom(`cdot-${i}`);
     if (dot) dot.className = 'calib-dot done';
   }
 
-  await _sleep(800);
+  await _calibSleep(800);
 
   if (overlay) { overlay.classList.add('fade-out'); }
-  await _sleep(450);
+  await _calibSleep(450);
   if (overlay) { overlay.classList.add('hidden'); overlay.classList.remove('fade-out'); }
 
   _calibInternal.active = false;
