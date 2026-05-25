@@ -11,6 +11,17 @@
  */
 'use strict';
 
+// ─── getUserMedia Interceptor (Fixes MediaPipe track release bug) ──────────────
+const _activeStreams = [];
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  const originalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+  navigator.mediaDevices.getUserMedia = async function(constraints) {
+    const stream = await originalGetUserMedia(constraints);
+    if (stream) _activeStreams.push(stream);
+    return stream;
+  };
+}
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 const GAME_DURATION_S  = 45;
 const MAX_DISCOUNT_PCT = 60;
@@ -561,6 +572,7 @@ async function beginGame() {
 function endGame() {
   _gameActive = false;
   _playBuzzer();
+  _stopCamera(); // Turn off the camera stream immediately!
 
   const finalWinks    = _winkCount;
   const finalDiscount = Math.min(Math.floor(finalWinks / 3), MAX_DISCOUNT_PCT);
@@ -624,6 +636,33 @@ async function startChallenge() {
   }
 }
 
+// ─── Camera cleanup ──────────────────────────────────────────────────────────
+function _stopCamera() {
+  // 1. Force stop all tracks on intercepted streams to resolve MediaPipe track leak
+  while (_activeStreams.length > 0) {
+    const stream = _activeStreams.pop();
+    if (stream && typeof stream.getTracks === 'function') {
+      stream.getTracks().forEach(track => {
+        try { track.stop(); } catch (_) {}
+      });
+    }
+  }
+
+  // 2. Stop tracks on video element
+  const videoEl = _dom('webcam-video');
+  if (videoEl && videoEl.srcObject) {
+    const stream = videoEl.srcObject;
+    if (stream && typeof stream.getTracks === 'function') {
+      stream.getTracks().forEach(track => {
+        try { track.stop(); } catch (_) {}
+      });
+    }
+    videoEl.srcObject = null;
+  }
+  if (_camera)   { try { _camera.stop();    } catch (_) {} _camera   = null; }
+  if (_faceMesh) { try { _faceMesh.close(); } catch (_) {} _faceMesh = null; }
+}
+
 /**
  * Reset everything and go back to the welcome screen.
  */
@@ -636,13 +675,7 @@ function resetToWelcome() {
   _stopConfetti();
   _resetWinkState();
 
-  const videoEl = _dom('webcam-video');
-  if (videoEl && videoEl.srcObject) {
-    videoEl.srcObject.getTracks().forEach(t => t.stop());
-    videoEl.srcObject = null;
-  }
-  if (_camera)   { try { _camera.stop();    } catch (_) {} _camera   = null; }
-  if (_faceMesh) { try { _faceMesh.close(); } catch (_) {} _faceMesh = null; }
+  _stopCamera();
 
   // Reset UI
   const wcd = _dom('wink-count-display');
