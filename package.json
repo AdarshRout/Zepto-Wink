@@ -1,0 +1,14 @@
+{
+  "name": "zepto-wink-challenge",
+  "version": "1.0.0",
+  "description": "Zepto Wink Challenge - promotional gamified discount app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "selfsigned": "^2.4.1"
+  }
+}

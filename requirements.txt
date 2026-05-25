@@ -1,0 +1,42 @@
+# requirements.txt
+#
+# This project is a pure front-end web app (HTML + Vanilla JS).
+# There are NO Python dependencies.
+#
+# Node.js dependencies are listed in package.json.
+# The packages below are the production Node.js dependencies
+# documented here for reference:
+#
+# ── Node.js / npm packages ───────────────────────────────────────────────────
+#
+# express@^4.18.2
+#   Minimal web framework used for the local HTTPS dev server.
+#   NOT required on Vercel (static hosting is used instead).
+#
+# selfsigned@^2.4.1
+#   Generates a self-signed TLS certificate for localhost HTTPS.
+#   Required only for local development so the browser allows camera access.
+#   NOT required on Vercel (Vercel provides real HTTPS certs automatically).
+#
+# ── CDN dependencies (loaded at runtime, no install needed) ──────────────────
+#
+# @mediapipe/face_mesh          — Real-time 468-point face landmark detection
+# @mediapipe/camera_utils       — MediaPipe camera helper
+# @mediapipe/control_utils      — MediaPipe control utilities
+# @mediapipe/drawing_utils      — MediaPipe canvas drawing utilities
+# tailwindcss (CDN)             — Utility-first CSS framework
+# Google Fonts: Orbitron, Inter — Typography
+#
+# ── To install Node.js dependencies ─────────────────────────────────────────
+#
+#   npm install
+#
+# ── To run locally ───────────────────────────────────────────────────────────
+#
+#   npm run dev
+#   # Then open https://localhost:5000
+#
+# ── To deploy (Vercel) ───────────────────────────────────────────────────────
+#
+#   vercel --prod
+#   # or push to GitHub and connect via vercel.com/new

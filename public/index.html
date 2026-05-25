@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Zepto Wink Challenge - Wink Fast, Save Big!</title>
+  <meta name="description" content="Play the Zepto Wink Challenge! Wink as fast as you can in 45 seconds to earn massive discounts. Every 3 winks = 1% off your order!" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            zeptoPurple:  '#500073',
+            zeptoDark:    '#2a003d',
+            zeptoDeep:    '#1a0028',
+            zeptoCoral:   '#ff5252',
+            zeptoOrange:  '#ff7043',
+            zeptoMagenta: '#c800ff',
+            zeptoGlow:    '#e040fb',
+          },
+          fontFamily: {
+            display: ['Orbitron', 'sans-serif'],
+            body:    ['Inter', 'sans-serif'],
+          },
+          animation: {
+            'pulse-ring':    'pulseRing 0.6s ease-out forwards',
+            'float':         'float 3s ease-in-out infinite',
+            'shimmer':       'shimmer 2s linear infinite',
+            'bounce-in':     'bounceIn 0.5s cubic-bezier(0.68,-0.55,0.27,1.55) forwards',
+            'confetti-fall': 'confettiFall 3s ease-in forwards',
+            'glow-pulse':    'glowPulse 1.5s ease-in-out infinite',
+            'count-pop':     'countPop 0.3s cubic-bezier(0.68,-0.55,0.27,1.55) forwards',
+          },
+          keyframes: {
+            pulseRing: {
+              '0%':   { opacity: '1', transform: 'scale(1)' },
+              '100%': { opacity: '0', transform: 'scale(1.12)' },
+            },
+            float: {
+              '0%,100%': { transform: 'translateY(0px)' },
+              '50%':     { transform: 'translateY(-12px)' },
+            },
+            shimmer: {
+              '0%':   { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' },
+            },
+            bounceIn: {
+              '0%':   { opacity: '0', transform: 'scale(0.3)' },
+              '60%':  { opacity: '1', transform: 'scale(1.1)' },
+              '100%': { opacity: '1', transform: 'scale(1)' },
+            },
+            confettiFall: {
+              '0%':   { transform: 'translateY(-100px) rotate(0deg)', opacity: '1' },
+              '100%': { transform: 'translateY(100vh) rotate(720deg)', opacity: '0' },
+            },
+            glowPulse: {
+              '0%,100%': { textShadow: '0 0 20px #ffffff, 0 0 40px #ffffff' },
+              '50%':     { textShadow: '0 0 40px #ffffff, 0 0 80px #ffffff, 0 0 120px rgba(255,255,255,0.8)' },
+            },
+            countPop: {
+              '0%':   { transform: 'scale(1)' },
+              '50%':  { transform: 'scale(1.35)' },
+              '100%': { transform: 'scale(1)' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- MediaPipe Face Mesh -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #1a0028;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      min-height: 100dvh;
+    }
+
+    /* ── Animated background ── */
+    .bg-animated {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 20% 20%, #500073 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 80%, #2a003d 0%, transparent 50%),
+                  radial-gradient(ellipse at 50% 50%, #1a0028 0%, #0d001a 100%);
+      z-index: 0;
+    }
+    .bg-animated::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23500073' fill-opacity='0.08'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      animation: bgDrift 20s linear infinite;
+    }
+    @keyframes bgDrift {
+      0%   { background-position: 0 0; }
+      100% { background-position: 60px 60px; }
+    }
+
+    /* ── Screens ── */
+    .screen {
+      position: relative;
+      z-index: 1;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .screen.hidden {
+      display: none;
+    }
+
+    /* ── Gloss card ── */
+    .gloss-card {
+      background: linear-gradient(135deg, rgba(80,0,115,0.55) 0%, rgba(42,0,61,0.75) 100%);
+      border: 1px solid rgba(255,255,255,0.15);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.06) inset,
+        0 25px 60px rgba(0,0,0,0.5),
+        0 0 80px rgba(80,0,115,0.3);
+    }
+
+
+
+    /* ── Video container ── */
+    #video-wrapper {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 3px solid rgba(255,255,255,0.2);
+      box-shadow: 0 0 30px rgba(80,0,115,0.6), 0 0 60px rgba(80,0,115,0.3);
+      transition: box-shadow 0.1s ease;
+    }
+    #video-wrapper.wink-flash {
+      box-shadow:
+        0 0 0 6px rgba(255,82,82,0.9),
+        0 0 40px rgba(255,82,82,0.7),
+        0 0 80px rgba(255,82,82,0.4);
+      border-color: rgba(255,82,82,0.9);
+    }
+
+    #webcam-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transform: scaleX(-1); /* Mirror for selfie view */
+    }
+
+    #overlay-canvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      transform: scaleX(-1);
+    }
+
+    /* ── Digital counter ── */
+    .digital-counter {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow:
+        0 0 20px rgba(255,255,255,0.8),
+        0 0 40px rgba(255,255,255,0.5),
+        0 0 80px rgba(255,255,255,0.3);
+      line-height: 1;
+      transition: transform 0.1s ease;
+    }
+    .digital-counter.pop {
+      animation: countPop 0.3s cubic-bezier(0.68,-0.55,0.27,1.55) forwards;
+    }
+
+    /* ── Timer bar ── */
+    #timer-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #ff5252, #ff7043, #c800ff);
+      transition: width 0.25s linear;
+      position: relative;
+      overflow: hidden;
+    }
+    #timer-bar-fill::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s linear infinite;
+    }
+
+    /* ── Discount badge ── */
+    .discount-badge {
+      background: linear-gradient(135deg, rgba(200,0,255,0.2), rgba(80,0,115,0.4));
+      border: 1px solid rgba(200,0,255,0.5);
+      border-radius: 999px;
+      padding: 6px 20px;
+      font-weight: 700;
+      backdrop-filter: blur(10px);
+    }
+
+    /* ── CTA Button ── */
+    .cta-btn {
+      background: linear-gradient(135deg, #ff5252 0%, #ff7043 50%, #ff5252 100%);
+      background-size: 200% 100%;
+      color: #ffffff;
+      font-weight: 900;
+      font-family: 'Orbitron', monospace;
+      letter-spacing: 1px;
+      border: none;
+      cursor: pointer;
+      border-radius: 16px;
+      padding: 18px 48px;
+      font-size: 1.1rem;
+      box-shadow: 0 8px 32px rgba(255,82,82,0.5), 0 0 0 0 rgba(255,82,82,0);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 14px 40px rgba(255,82,82,0.7), 0 0 40px rgba(255,82,82,0.3);
+      background-position: right center;
+    }
+    .cta-btn:active {
+      transform: translateY(0px) scale(0.98);
+    }
+    .cta-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.4s ease;
+    }
+    .cta-btn:hover::before {
+      transform: translateX(100%);
+    }
+
+    /* ── Coupon card ── */
+    .coupon-card {
+      background: linear-gradient(135deg, rgba(255,82,82,0.05) 0%, rgba(200,0,255,0.08) 100%);
+      border: 2px dashed rgba(255,82,82,0.4);
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .coupon-card::before,
+    .coupon-card::after {
+      content: '';
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      background: #1a0028;
+      border-radius: 50%;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .coupon-card::before { left: -14px; }
+    .coupon-card::after  { right: -14px; }
+
+    /* ── Promo code block ── */
+    .promo-code {
+      background: linear-gradient(135deg, #ff5252, #ff7043);
+      color: #ffffff;
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      letter-spacing: 3px;
+      border-radius: 12px;
+      padding: 14px 28px;
+      font-size: 1.3rem;
+      box-shadow: 0 6px 24px rgba(255,82,82,0.5);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: all;
+      position: relative;
+    }
+    .promo-code:hover {
+      transform: scale(1.03);
+      box-shadow: 0 10px 35px rgba(255,82,82,0.7);
+    }
+
+    /* ── Confetti ── */
+    @keyframes confettiFall {
+      0%   { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+    .confetti-piece {
+      position: fixed;
+      width: 10px;
+      height: 14px;
+      border-radius: 2px;
+      z-index: 9999;
+      pointer-events: none;
+      animation: confettiFall var(--duration) ease-in var(--delay) forwards;
+    }
+
+    /* ── Wink indicator overlay ── */
+    #wink-indicator {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,82,82,0.9);
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      padding: 4px 14px;
+      border-radius: 999px;
+      opacity: 0;
+      transition: opacity 0.1s ease;
+      white-space: nowrap;
+      z-index: 10;
+    }
+    #wink-indicator.show {
+      opacity: 1;
+    }
+
+    /* ── EAR debug bars ── */
+    .ear-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.7);
+      font-family: 'Orbitron', monospace;
+    }
+    .ear-bar {
+      flex: 1;
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .ear-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #c800ff, #ff5252);
+      transition: width 0.08s linear;
+    }
+
+    /* ── Floating emoji ── */
+    .floating-emoji {
+      animation: float 3s ease-in-out infinite;
+      display: inline-block;
+    }
+
+    /* ── Copy toast ── */
+    #copy-toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: linear-gradient(135deg, #ff5252, #ff7043);
+      color: #ffffff;
+      font-weight: 800;
+      padding: 12px 28px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      box-shadow: 0 8px 30px rgba(255,82,82,0.5);
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+      opacity: 0;
+      z-index: 10000;
+      letter-spacing: 0.5px;
+    }
+    #copy-toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ── Buzzer flash ── */
+    @keyframes buzzerFlash {
+      0%,100% { opacity: 0; }
+      10%,30%,50% { opacity: 0.25; }
+      20%,40% { opacity: 0; }
+    }
+    #buzzer-overlay {
+      position: fixed;
+      inset: 0;
+      background: #ff5252;
+      z-index: 9998;
+      pointer-events: none;
+      opacity: 0;
+    }
+    #buzzer-overlay.flash {
+      animation: buzzerFlash 0.8s ease forwards;
+    }
+
+    /* ── Mobile responsive tweaks ── */
+    @media (max-width: 480px) {
+      .digital-counter { font-size: 4.5rem !important; }
+      .promo-code { font-size: 1rem; letter-spacing: 2px; padding: 12px 18px; }
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,82,82,0.4); border-radius: 99px; }
+
+    /* ══════════════════════════════════════════════════
+       CALIBRATION OVERLAY
+       ══════════════════════════════════════════════════ */
+
+    #calib-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      background: linear-gradient(180deg,
+        rgba(15,0,25,0.88) 0%,
+        rgba(26,0,40,0.94) 100%);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border-radius: 20px;
+      transition: opacity 0.4s ease;
+    }
+    #calib-overlay.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #calib-overlay.hidden { display: none; }
+
+    /* Step progress dots */
+    .calib-dots {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1rem;
+    }
+    .calib-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      transition: all 0.3s ease;
+    }
+    .calib-dot.active {
+      background: #ffffff;
+      box-shadow: 0 0 10px rgba(255,255,255,0.8);
+      transform: scale(1.25);
+    }
+    .calib-dot.done {
+      background: #44ff88;
+      border-color: #44ff88;
+      box-shadow: 0 0 8px rgba(68,255,136,0.6);
+    }
+
+    /* Big icon */
+    #calib-icon {
+      font-size: 3.5rem;
+      margin-bottom: 0.5rem;
+      filter: drop-shadow(0 0 16px rgba(255,255,255,0.6));
+      animation: floatIcon 2.5s ease-in-out infinite;
+    }
+    @keyframes floatIcon {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-8px); }
+    }
+
+    /* Title / subtitle */
+    #calib-title {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: 1.05rem;
+      color: #ffffff;
+      text-align: center;
+      letter-spacing: 1px;
+      text-shadow: 0 0 20px rgba(255,255,255,0.5);
+      margin-bottom: 0.35rem;
+    }
+    #calib-subtitle {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.65);
+      text-align: center;
+      max-width: 260px;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+
+    /* SVG countdown ring */
+    .calib-ring-wrap {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1rem;
+    }
+    .calib-ring-wrap svg {
+      transform: rotate(-90deg);
+    }
+    .calib-ring-bg {
+      fill: none;
+      stroke: rgba(255,255,255,0.12);
+      stroke-width: 6;
+    }
+    .calib-ring-fill {
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-dasharray: 220;
+      stroke-dashoffset: 220;
+      transition: stroke-dashoffset 0.12s linear,
+                  stroke 0.3s ease;
+      filter: drop-shadow(0 0 6px rgba(255,255,255,0.8));
+    }
+    .calib-ring-fill.capturing {
+      stroke: #c800ff;
+      filter: drop-shadow(0 0 6px rgba(200,0,255,0.8));
+    }
+    .calib-ring-fill.success {
+      stroke: #44ff88;
+      filter: drop-shadow(0 0 6px rgba(68,255,136,0.8));
+    }
+    #calib-ring-label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #calib-ring-sec {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1;
+    }
+    #calib-ring-unit {
+      font-size: 0.55rem;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 1px;
+    }
+
+    /* Live EAR pills */
+    .calib-ear-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 0.85rem;
+    }
+    .calib-ear-pill {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.8);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .calib-ear-pill .pill-label {
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.65rem;
+    }
+    .calib-ear-pill.ear-closed {
+      border-color: rgba(255,68,68,0.6);
+      background: rgba(255,68,68,0.1);
+      color: #ff8888;
+    }
+    .calib-ear-pill.ear-open {
+      border-color: rgba(68,255,136,0.6);
+      background: rgba(68,255,136,0.08);
+      color: #44ff88;
+    }
+
+    /* Status badge */
+    #calib-status {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      padding: 4px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 0.85rem;
+      transition: all 0.3s ease;
+    }
+    #calib-status.success {
+      background: rgba(68,255,136,0.12);
+      border-color: rgba(68,255,136,0.5);
+      color: #44ff88;
+    }
+    #calib-status.active {
+      background: rgba(200,0,255,0.12);
+      border-color: rgba(200,0,255,0.5);
+      color: #e080ff;
+    }
+
+    /* Skip link */
+    #calib-skip {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.3);
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color 0.2s;
+      background: none;
+      border: none;
+    }
+    #calib-skip:hover { color: rgba(255,255,255,0.6); }
+
+    /* Instruction highlight */
+    .calib-highlight {
+      color: #ff5252;
+      font-weight: 700;
+    }
+
+    /* Recalibrate button on game screen */
+    #btn-recalibrate {
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.4);
+      background: none;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: color 0.2s;
+      font-family: 'Orbitron', monospace;
+      padding: 0;
+    }
+    #btn-recalibrate:hover { color: rgba(255,255,255,0.9); }
+  </style>
+</head>
+
+<body>
+
+<!-- Animated background layer -->
+<div class="bg-animated"></div>
+
+<!-- Buzzer flash overlay -->
+<div id="buzzer-overlay"></div>
+
+<!-- Copy toast -->
+<div id="copy-toast">✅ Code copied to clipboard!</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SCREEN 1 - WELCOME
+     ════════════════════════════════════════════════════════ -->
+<div id="screen-welcome" class="screen">
+  <div class="gloss-card w-full max-w-lg p-8 sm:p-10 text-center" style="animation: bounceIn 0.6s ease forwards;">
+
+    <!-- Logo — alternating wink eyes -->
+    <style>
+      .wink-eyes { display:flex; gap:18px; align-items:center; justify-content:center; margin-bottom:4px; }
+
+      /* Each eye is a clipped oval */
+      .wink-eye {
+        position: relative;
+        width: 44px;
+        height: 30px;
+        border-radius: 50%;
+        overflow: hidden;
+        box-shadow: 0 0 18px rgba(200,0,255,0.55), 0 0 6px rgba(200,0,255,0.3);
+        background: #fff;
+      }
+
+      /* Iris + pupil sit centered inside the sclera */
+      .wink-iris {
+        position: absolute;
+        width: 20px; height: 20px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 38% 38%, #7c3aed, #4c1d95 60%, #1e0040);
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+      }
+      .wink-iris::after {          /* pupil */
+        content:'';
+        position:absolute;
+        width:11px; height:11px;
+        border-radius:50%;
+        background:#000;
+        top:50%; left:50%;
+        transform:translate(-50%,-50%);
+      }
+      .wink-iris::before {         /* specular highlight */
+        content:'';
+        position:absolute;
+        width:6px; height:6px;
+        border-radius:50%;
+        background:rgba(255,255,255,0.75);
+        top:18%; left:22%;
+      }
+
+      /* The eyelid slides DOWN to close, UP to open */
+      .wink-lid {
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 100%;
+        background: linear-gradient(180deg, #2a003d 60%, #500073);
+        border-radius: 0 0 50% 50%;
+        transform-origin: top center;
+        /* scaleY(0)=open, scaleY(1)=closed */
+        animation: lidClose 1.6s ease-in-out infinite;
+      }
+
+      /* Left eye: starts open → closes → opens */
+      .wink-eye.left  .wink-lid { animation-name: lidClose; animation-delay: 0s; }
+      /* Right eye: starts closed → opens → closes (180° offset) */
+      .wink-eye.right .wink-lid { animation-name: lidClose; animation-delay: -0.8s; }
+
+      @keyframes lidClose {
+        0%   { transform: scaleY(0.05); }   /* open  */
+        30%  { transform: scaleY(1);    }   /* fully closed */
+        50%  { transform: scaleY(1);    }   /* hold closed  */
+        80%  { transform: scaleY(0.05); }   /* open  */
+        100% { transform: scaleY(0.05); }   /* open  */
+      }
+
+      /* Lashes on the lid edge */
+      .wink-lid::after {
+        content: '';
+        position: absolute;
+        bottom: -2px; left: 10%; right: 10%;
+        height: 5px;
+        border-radius: 0 0 50% 50%;
+        background: #1a0028;
+      }
+    </style>
+
+    <div class="mb-6 flex flex-col items-center gap-2">
+      <!-- Zepto brand image -->
+      <img src="zepto-logo.png" alt="Zepto" class="h-24 md:h-28 floating-emoji" style="animation-duration:4s; filter: drop-shadow(0px 0px 2px rgba(255,255,255,0.9)) drop-shadow(0px 0px 4px rgba(255,255,255,0.6));">
+      <!-- Alternating wink eyes -->
+      <div class="wink-eyes" style="margin-top:6px;">
+        <div class="wink-eye left">
+          <div class="wink-iris"></div>
+          <div class="wink-lid"></div>
+        </div>
+        <div class="wink-eye right">
+          <div class="wink-iris"></div>
+          <div class="wink-lid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Headline -->
+    <h1 class="font-display font-black text-3xl sm:text-4xl leading-tight mb-2" style="color:#ffffff; text-shadow: 0 0 30px rgba(255,255,255,0.5);">
+      Zepto Wink Challenge
+    </h1>
+    <p class="text-xl font-bold mb-6" style="color: rgba(255,255,255,0.75); letter-spacing: 1px;">
+      Wink Fast, Save Big! 😉
+    </p>
+
+    <!-- Rule card -->
+    <div class="rounded-2xl p-5 mb-6 text-left" style="background: rgba(200,0,255,0.08); border: 1px solid rgba(200,0,255,0.3);">
+      <p class="text-white font-semibold text-base mb-3 flex items-center gap-2">
+        <span class="text-xl">📋</span> Here's How It Works:
+      </p>
+      <ul class="space-y-2">
+        <li class="text-gray-300 text-sm flex items-start gap-2">
+          <span class="text-white mt-0.5">⏱</span>
+          <span>You have <strong class="text-white">45 seconds</strong> to wink as much as you can.</span>
+        </li>
+        <li class="text-gray-300 text-sm flex items-start gap-2">
+          <span class="text-white mt-0.5">🎯</span>
+          <span>Each <strong class="text-white">Wink = 0.33% off</strong> your next Zepto order!</span>
+        </li>
+        <li class="text-gray-300 text-sm flex items-start gap-2">
+          <span class="text-white mt-0.5">👁️</span>
+          <span><strong class="text-white">Only single-eye winks count</strong> - double blinks are ignored!</span>
+        </li>
+        <li class="text-gray-300 text-sm flex items-start gap-2">
+          <span class="text-white mt-0.5">🏆</span>
+          <span>Now Start Winking and get: <strong class="text-white">Upto 60% Off!</strong></span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- One chance warning -->
+    <div class="rounded-xl px-4 py-3 mb-4 text-center" style="background: rgba(255,82,82,0.06); border: 1px solid rgba(255,82,82,0.25);">
+      <p class="text-sm font-bold" style="color: #ffffff; letter-spacing: 0.5px;">
+        ⚡ You get only <span style="text-decoration: underline; text-underline-offset: 3px;">1 GOLDEN chance</span>
+      </p>
+    </div>
+
+    <!-- CTA -->
+    <button id="btn-start" class="cta-btn w-full text-lg" onclick="startChallenge()">
+      🚀 Start Challenge
+    </button>
+
+    <!-- Tips -->
+    <div class="rounded-xl px-4 py-3 mt-4 text-sm text-gray-400" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);">
+      💡 <strong class="text-white">Tip:</strong> Alternate between left and right winks for maximum speed!
+    </div>
+
+    <!-- Camera permission note -->
+    <p class="text-xs text-gray-500 mt-3 mb-1">📷 Camera access required for face tracking. No data is stored or transmitted.</p>
+
+    <!-- Error message placeholder -->
+    <p id="welcome-error" class="text-red-400 text-sm mt-2 hidden"></p>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SCREEN 2 - GAME ARENA
+     ════════════════════════════════════════════════════════ -->
+<div id="screen-game" class="screen hidden" style="padding: 1rem;">
+  <div class="w-full max-w-lg flex flex-col gap-4">
+
+    <!-- Top bar: Logo + Timer text -->
+    <div class="flex items-center justify-between px-1">
+      <img src="zepto-logo.png" alt="Zepto" class="h-6">
+      <div class="font-display font-bold text-sm" style="color: rgba(255,255,255,0.7); letter-spacing:1px;">WINK CHALLENGE</div>
+      <div id="timer-text" class="font-display font-black text-xl" style="color: #ffffff; text-shadow: 0 0 15px rgba(255,255,255,0.5);">45</div>
+    </div>
+
+    <!-- Timer seek bar -->
+    <div class="w-full h-3 rounded-full" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);">
+      <div id="timer-bar-fill" style="width: 100%;"></div>
+    </div>
+
+    <!-- Video + Canvas -->
+    <div id="video-wrapper" class="relative w-full" style="aspect-ratio: 4/3; max-height: 340px;">
+      <video id="webcam-video" autoplay playsinline muted></video>
+      <canvas id="overlay-canvas"></canvas>
+
+      <!-- Wink indicator popup -->
+      <div id="wink-indicator">👁️ WINK!</div>
+
+      <!-- Distance warning overlay -->
+      <div id="distance-warning" class="hidden absolute inset-0 z-[100] flex-col items-center justify-center text-white text-center backdrop-blur-md rounded-[20px]" style="background: rgba(255,82,82,0.85);">
+        <div class="text-6xl mb-2">👀</div>
+        <h2 class="font-display font-black text-2xl sm:text-3xl leading-tight text-white">MOVE CLOSER</h2>
+        <p class="font-bold text-sm mt-1 text-white">Your face is too far from the camera</p>
+      </div>
+
+      <!-- Eye Blocked / Out of frame warning -->
+      <div id="block-warning" class="hidden absolute inset-0 z-[100] flex-col items-center justify-center text-white text-center backdrop-blur-md rounded-[20px]" style="background: rgba(255,140,0,0.85);">
+        <div class="text-6xl mb-2">✋</div>
+        <h2 class="font-display font-black text-2xl sm:text-3xl leading-tight text-white">EYES BLOCKED</h2>
+        <p class="font-bold text-sm mt-1 text-white">Please keep both eyes clearly visible in the frame</p>
+      </div>
+
+      <!-- ── Calibration Overlay (lives INSIDE video-wrapper so it sits over the feed) ── -->
+      <div id="calib-overlay" class="hidden">
+
+        <!-- Step progress dots -->
+        <div class="calib-dots">
+          <div class="calib-dot" id="cdot-0"></div>
+          <div class="calib-dot" id="cdot-1"></div>
+          <div class="calib-dot" id="cdot-2"></div>
+        </div>
+
+        <!-- Icon -->
+        <div id="calib-icon">👁️</div>
+
+        <!-- Title -->
+        <div id="calib-title">CALIBRATING…</div>
+
+        <!-- Subtitle -->
+        <div id="calib-subtitle">Look normally at the screen and stay still.</div>
+
+        <!-- Countdown ring -->
+        <div class="calib-ring-wrap">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle class="calib-ring-bg" cx="40" cy="40" r="35"/>
+            <circle class="calib-ring-fill" id="calib-ring-fill" cx="40" cy="40" r="35"/>
+          </svg>
+          <div id="calib-ring-label">
+            <span id="calib-ring-sec">2</span>
+            <span id="calib-ring-unit">SEC</span>
+          </div>
+        </div>
+
+        <!-- Live EAR readout -->
+        <div class="calib-ear-row">
+          <div class="calib-ear-pill" id="calib-pill-left">
+            <span class="pill-label">L</span>
+            <span id="calib-ear-left">-</span>
+          </div>
+          <div class="calib-ear-pill" id="calib-pill-right">
+            <span class="pill-label">R</span>
+            <span id="calib-ear-right">-</span>
+          </div>
+        </div>
+
+        <!-- Status -->
+        <div id="calib-status">⏳ Waiting for face…</div>
+
+        <!-- Skip -->
+        <button id="calib-skip" onclick="skipCalibration()">Skip calibration</button>
+      </div>
+      <!-- ── End Calibration Overlay ── -->
+    </div>
+
+
+    <!-- Live wink count -->
+    <div class="gloss-card p-4 text-center">
+      <p class="text-xs font-semibold mb-1 uppercase tracking-widest" style="color: rgba(255,255,255,0.5);">Wink Count</p>
+      <div id="wink-count-display" class="digital-counter text-7xl sm:text-8xl">0</div>
+    </div>
+
+    <!-- EAR debug bars + Discount badge row -->
+    <div class="flex items-center gap-3">
+      <!-- EAR indicators -->
+      <div class="flex-1 gloss-card px-3 py-2 space-y-1.5">
+        <div class="ear-bar-wrap">
+          <span style="color: rgba(255,255,255,0.6); min-width: 18px;">L</span>
+          <div class="ear-bar">
+            <div id="ear-bar-left" class="ear-bar-fill" style="width: 50%;"></div>
+          </div>
+          <span id="ear-val-left" style="color: rgba(255,255,255,0.7); min-width: 32px;">0.3</span>
+        </div>
+        <div class="ear-bar-wrap">
+          <span style="color: rgba(255,255,255,0.6); min-width: 18px;">R</span>
+          <div class="ear-bar">
+            <div id="ear-bar-right" class="ear-bar-fill" style="width: 50%;"></div>
+          </div>
+          <span id="ear-val-right" style="color: rgba(255,255,255,0.7); min-width: 32px;">0.3</span>
+        </div>
+      </div>
+
+      <!-- Discount badge -->
+      <div class="discount-badge text-center" style="color: #ffffff; min-width: 130px;">
+        <div class="text-xs opacity-70 uppercase tracking-widest font-semibold">Discount</div>
+        <div id="live-discount" class="font-display font-black text-xl">0% Off</div>
+      </div>
+    </div>
+
+    <!-- Status text + recalibrate -->
+    <div class="flex items-center justify-between gap-2">
+      <div id="tracking-status" class="text-xs font-semibold uppercase tracking-widest flex-1" style="color: rgba(255,255,255,0.4);">
+        🔍 Initializing face tracking…
+      </div>
+      <button id="btn-recalibrate" onclick="restartCalibration()" style="display:none;">
+        ↻ RECALIBRATE
+      </button>
+    </div>
+
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     SCREEN 3 - REWARD / RESULTS
+     ════════════════════════════════════════════════════════ -->
+<div id="screen-reward" class="screen hidden">
+  <div class="gloss-card w-full max-w-lg p-8 text-center" style="animation: bounceIn 0.6s ease forwards;">
+
+    <!-- Header -->
+    <div class="mb-4">
+      <img src="zepto-logo.png" alt="Zepto" class="h-10 mx-auto mb-3">
+      <div class="text-4xl mb-2">🎉</div>
+      <h2 class="font-display font-black text-2xl sm:text-3xl" style="color: #ffffff;">
+        Challenge Complete!
+      </h2>
+      <p class="text-gray-300 text-sm mt-1">Here's what you won:</p>
+    </div>
+
+    <!-- Score summary -->
+    <div class="rounded-2xl px-6 py-4 mb-4" style="background: rgba(200,0,255,0.1); border: 1px solid rgba(200,0,255,0.3);">
+      <p class="text-gray-400 text-sm mb-1">Total Winks</p>
+      <div id="result-wink-count" class="font-display font-black text-5xl" style="color: #c800ff; text-shadow: 0 0 30px rgba(200,0,255,0.8);">0</div>
+      <p class="text-gray-400 text-sm mt-1">winks recorded</p>
+    </div>
+
+    <!-- Coupon card -->
+    <div class="coupon-card p-6 mb-6">
+      <p class="text-gray-400 text-xs uppercase tracking-widest mb-2 font-semibold">Your Exclusive Discount</p>
+      <div id="result-discount" class="font-display font-black mb-1" style="font-size: 3.5rem; color: #ffffff; text-shadow: 0 0 30px rgba(255,255,255,0.7), 0 0 60px rgba(255,255,255,0.4);">
+        0% OFF
+      </div>
+
+      <p class="text-gray-400 text-xs mb-2 font-semibold uppercase tracking-widest">Promo Code - Tap to Copy</p>
+      <div id="promo-code-display" class="promo-code" onclick="copyPromoCode()">ZEPTOWINK0</div>
+      <p class="text-gray-500 text-xs mt-2">Valid for 24 hours on Zepto app</p>
+    </div>
+
+    <!-- CTA buttons -->
+    <button class="cta-btn w-full" onclick="copyPromoCode()">
+      📋 Copy Code to App
+    </button>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     JAVASCRIPT - CORE LOGIC
+     ════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ─── Constants (fallback - replaced by calibration) ──────────────────────────
+const GAME_DURATION_S   = 45;
+const MAX_DISCOUNT_PCT  = 60;
+const SMOOTH_FRAMES     = 3;     // moving-average buffer depth (3 = ~100ms lag at 30fps)
+
+// Fallback thresholds used when calibration is skipped
+const FB_CLOSED = 0.30;
+const FB_OPEN   = 0.35;
+const FB_OTHER  = 0.22;
+
+const WINK_DEBOUNCE_MS  = 280;   // min ms between registered winks
+
+// SVG ring constants (circumference of r=35 circle ≈ 220)
+const RING_CIRC = 2 * Math.PI * 35; // 219.9
+
+// MediaPipe landmark indices
+// EAR: (||p2-p6|| + ||p3-p5||) / (2 * ||p1-p4||)
+const LEFT_EYE_IDX  = { p1: 263, p2: 387, p3: 386, p4: 362, p5: 373, p6: 380 };
+const RIGHT_EYE_IDX = { p1: 33,  p2: 160, p3: 159, p4: 133, p5: 144, p6: 153 };
+
+// ─── Calibration data ────────────────────────────────────────────────────────
+const calibData = {
+  phase: 'idle',   // idle | baseline | done
+  baseline: { leftSamples: [], rightSamples: [] },
+  thresholds: {
+    left:  { closed: FB_CLOSED, open: FB_OPEN, otherMin: FB_OTHER },
+    right: { closed: FB_CLOSED, open: FB_OPEN, otherMin: FB_OTHER },
+  },
+  calibrated: false,
+};
+
+// ─── EAR smoothing buffers ────────────────────────────────────────────────────
+const earBuffer = { left: [], right: [] };
+
+function pushEAR(side, val) {
+  earBuffer[side].push(val);
+  if (earBuffer[side].length > SMOOTH_FRAMES) earBuffer[side].shift();
+}
+function smoothEAR(side) {
+  const buf = earBuffer[side];
+  if (!buf.length) return 0.35;
+  return buf.reduce((a, b) => a + b, 0) / buf.length;
+}
+
+// ─── State ───────────────────────────────────────────────────────────────────
+let winkCount     = 0;
+let timerInterval = null;
+let timeLeft      = GAME_DURATION_S;
+let gameActive    = false;
+let calibActive   = false;
+let faceMesh      = null;
+let camera        = null;
+let promoCode     = '';
+let cameraStream  = null;
+
+const eyeState = {
+  left:  { closed: false, lastWinkTs: 0, needsReset: false, tainted: false },
+  right: { closed: false, lastWinkTs: 0, needsReset: false, tainted: false },
+};
+
+// ─── DOM refs ────────────────────────────────────────────────────────────────
+const screenWelcome       = document.getElementById('screen-welcome');
+const screenGame          = document.getElementById('screen-game');
+const screenReward        = document.getElementById('screen-reward');
+const videoEl             = document.getElementById('webcam-video');
+const canvasEl            = document.getElementById('overlay-canvas');
+const ctx                 = canvasEl.getContext('2d');
+const videoWrapper        = document.getElementById('video-wrapper');
+const winkCountDisplay    = document.getElementById('wink-count-display');
+const timerText           = document.getElementById('timer-text');
+const timerBarFill        = document.getElementById('timer-bar-fill');
+const liveDiscount        = document.getElementById('live-discount');
+const trackingStatus      = document.getElementById('tracking-status');
+const winkIndicator       = document.getElementById('wink-indicator');
+const resultWinkCount     = document.getElementById('result-wink-count');
+const resultDiscount      = document.getElementById('result-discount');
+const resultEquation      = document.getElementById('result-equation');
+const promoCodeDisplay    = document.getElementById('promo-code-display');
+const earBarLeft          = document.getElementById('ear-bar-left');
+const earBarRight         = document.getElementById('ear-bar-right');
+const earValLeft          = document.getElementById('ear-val-left');
+const earValRight         = document.getElementById('ear-val-right');
+const welcomeError        = document.getElementById('welcome-error');
+const buzzerOverlay       = document.getElementById('buzzer-overlay');
+// Calibration DOM
+const calibOverlay        = document.getElementById('calib-overlay');
+const calibIcon           = document.getElementById('calib-icon');
+const calibTitle          = document.getElementById('calib-title');
+const calibSubtitle       = document.getElementById('calib-subtitle');
+const calibRingFill       = document.getElementById('calib-ring-fill');
+const calibRingSec        = document.getElementById('calib-ring-sec');
+const calibPillLeft       = document.getElementById('calib-pill-left');
+const calibPillRight      = document.getElementById('calib-pill-right');
+const calibEarLeft        = document.getElementById('calib-ear-left');
+const calibEarRight       = document.getElementById('calib-ear-right');
+const calibStatus         = document.getElementById('calib-status');
+const recalibrateBtn      = document.getElementById('btn-recalibrate');
+
+// ─── EAR calculation ─────────────────────────────────────────────────────────
+function euclidean(a, b) {
+  return Math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2);
+}
+function computeEAR(landmarks, idx) {
+  const p1=landmarks[idx.p1], p2=landmarks[idx.p2], p3=landmarks[idx.p3];
+  const p4=landmarks[idx.p4], p5=landmarks[idx.p5], p6=landmarks[idx.p6];
+  const h = euclidean(p1, p4);
+  if (h < 0.001) return 0.35;
+  return (euclidean(p2,p6) + euclidean(p3,p5)) / (2.0 * h);
+}
+
+// ─── Calibration UI helpers ───────────────────────────────────────────────────
+// Single baseline phase - no wink demonstration needed.
+// Thresholds are computed as a percentage of the open-eye EAR.
+const STEP_META = [
+  {
+    dotIdx: 0, icon: '👀', title: 'EYE CALIBRATION',
+    subtitle: 'Look <span class="calib-highlight">naturally</span> at the camera. Keep <span class="calib-highlight">both eyes open</span>.',
+    durationMs: 3500, ringColor: null,
+  },
+];
+
+function setCalibDot(activeIdx) {
+  for (let i = 0; i < 3; i++) {
+    const dot = document.getElementById(`cdot-${i}`);
+    dot.className = 'calib-dot';
+    if (i < activeIdx)  dot.classList.add('done');
+    if (i === activeIdx) dot.classList.add('active');
+  }
+}
+
+function setCalibStatus(text, cls = '') {
+  calibStatus.className = '';
+  if (cls) calibStatus.classList.add(cls);
+  calibStatus.textContent = text;
+}
+
+function animateRing(durationMs, ringClass) {
+  calibRingFill.setAttribute('class', 'calib-ring-fill');
+  if (ringClass) calibRingFill.classList.add(ringClass);
+  calibRingFill.style.transition = 'none';
+  calibRingFill.style.strokeDashoffset = RING_CIRC;
+  void calibRingFill.getBoundingClientRect();
+  calibRingFill.style.transition = `stroke-dashoffset ${durationMs}ms linear`;
+  calibRingFill.style.strokeDashoffset = 0;
+}
+
+function updateCalibEarPills(lEAR, rEAR) {
+  calibEarLeft.textContent  = lEAR.toFixed(3);
+  calibEarRight.textContent = rEAR.toFixed(3);
+  // During baseline both pills show as open/active
+  calibPillLeft.className  = 'calib-ear-pill ear-open';
+  calibPillRight.className = 'calib-ear-pill ear-open';
+}
+
+// ─── Calibration state machine ───────────────────────────────────────────────
+async function startCalibration() {
+  calibActive = true;
+  calibData.phase = 'idle';
+  calibData.baseline.leftSamples  = [];
+  calibData.baseline.rightSamples = [];
+  calibData.calibrated = false;
+  earBuffer.left  = [];
+  earBuffer.right = [];
+
+  calibOverlay.classList.remove('hidden', 'fade-out');
+  setCalibStatus('⏳ Waiting for face…');
+  setCalibDot(0);
+
+  // Wait until face is detected (poll every 100ms)
+  await new Promise(resolve => {
+    const poll = setInterval(() => {
+      if (window._calibFaceReady) { clearInterval(poll); resolve(); }
+    }, 100);
+  });
+
+  // Single baseline phase: just look naturally at the camera
+  await runCalibPhase(0, 'baseline');
+
+  // Compute thresholds from baseline EAR (percentage-based - no wink demo needed)
+  finishCalibration();
+
+  // Success feedback
+  setCalibStatus('✅ Calibration complete!', 'success');
+  calibRingFill.setAttribute('class', 'calib-ring-fill success');
+  calibRingFill.style.strokeDashoffset = 0;
+  for (let i = 0; i < 3; i++) document.getElementById(`cdot-${i}`).className = 'calib-dot done';
+  await sleep(800);
+
+  calibOverlay.classList.add('fade-out');
+  await sleep(450);
+  calibOverlay.classList.add('hidden');
+  calibOverlay.classList.remove('fade-out');
+  calibActive = false;
+  recalibrateBtn.style.display = 'inline';
+
+  await beginGame();
+}
+
+function runCalibPhase(stepIdx, phaseId) {
+  return new Promise(resolve => {
+    const meta = STEP_META[stepIdx];
+    calibData.phase = phaseId;
+
+    setCalibDot(stepIdx);
+    calibIcon.textContent    = meta.icon;
+    calibTitle.textContent   = meta.title;
+    calibSubtitle.innerHTML  = meta.subtitle;
+    
+    let timeLeftMs = meta.durationMs;
+    calibRingSec.textContent = Math.ceil(timeLeftMs / 1000);
+
+    setCalibStatus('⏺ Capturing…', 'active');
+    
+    calibRingFill.setAttribute('class', 'calib-ring-fill');
+    if (meta.ringColor) calibRingFill.classList.add(meta.ringColor);
+    calibRingFill.style.transition = 'none';
+
+    const loopMs = 100;
+    const tick = setInterval(() => {
+      if (window._faceInRange) {
+        timeLeftMs -= loopMs;
+        calibRingSec.textContent = Math.ceil(timeLeftMs / 1000);
+        
+        const progress = Math.max(0, timeLeftMs / meta.durationMs);
+        calibRingFill.style.strokeDashoffset = RING_CIRC * progress;
+        
+        if (timeLeftMs <= 0) {
+          clearInterval(tick);
+          calibRingFill.style.strokeDashoffset = 0;
+          setCalibStatus('✅ Got it!', 'success');
+          setTimeout(resolve, 350);
+        }
+      }
+    }, loopMs);
+  });
+}
+
+function finishCalibration() {
+  const avgArr = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : FB_OPEN;
+  const lOpen = avgArr(calibData.baseline.leftSamples);
+  const rOpen = avgArr(calibData.baseline.rightSamples);
+
+  // A wink = target eye EAR drops to ≤85% of its natural open value (raw, not smoothed — catches quick winks).
+  // "Other eye stable" = other eye smoothed EAR stays above 75% of its natural open value
+  // (smoothed to avoid noise; 75% is lenient enough to survive mild sympathetic drops).
+  calibData.thresholds.left = {
+    closed:   lOpen * 0.85,   // raw EAR must drop below this to count as "closed"
+    open:     lOpen * 0.95,   // smoothed EAR must rise above this to register the wink
+    otherMin: rOpen * 0.75,   // right eye (smoothed) must stay above this during a left wink
+  };
+  calibData.thresholds.right = {
+    closed:   rOpen * 0.85,
+    open:     rOpen * 0.95,
+    otherMin: lOpen * 0.75,   // left eye (smoothed) must stay above this during a right wink
+  };
+
+  calibData.calibrated = true;
+
+  console.log(`[Calib] L open EAR: ${lOpen.toFixed(3)} → wink threshold < ${calibData.thresholds.left.closed.toFixed(3)}`);
+  console.log(`[Calib] R open EAR: ${rOpen.toFixed(3)} → wink threshold < ${calibData.thresholds.right.closed.toFixed(3)}`);
+}
+
+function skipCalibration() {
+  calibActive = false;
+  calibData.thresholds.left  = { closed: FB_CLOSED, open: FB_OPEN, otherMin: FB_OTHER };
+  calibData.thresholds.right = { closed: FB_CLOSED, open: FB_OPEN, otherMin: FB_OTHER };
+  // Symmetry/width baselines remain null — checks fall back to absolute thresholds
+  calibData.calibrated = false;
+  calibOverlay.classList.add('hidden');
+  recalibrateBtn.style.display = 'inline';
+  beginGame();
+}
+
+async function restartCalibration() {
+  try {
+    if (gameActive) { clearInterval(timerInterval); gameActive = false; }
+    // Reset timer display so the bar doesn't show stale time
+    timeLeft = GAME_DURATION_S;
+    updateTimerUI();
+    earBuffer.left  = [];
+    earBuffer.right = [];
+    eyeState.left.closed       = false;
+    eyeState.right.closed      = false;
+    eyeState.left.needsReset   = false;
+    eyeState.right.needsReset  = false;
+    eyeState.left.tainted      = false;
+    eyeState.right.tainted     = false;
+    window._calibFaceReady = false;
+    recalibrateBtn.style.display = 'none';
+    winkCount = 0;
+    updateWinkUI();
+    await startCalibration();
+  } catch (err) {
+    console.error('[Recalibrate] Error during recalibration:', err);
+    // Fallback: use hardcoded thresholds and start the game anyway
+    skipCalibration();
+  }
+}
+
+// ─── Calibration frame handler ───────────────────────────────────────────────
+function onCalibFrame(lEAR, rEAR) {
+  window._calibFaceReady = true;
+  updateCalibEarPills(lEAR, rEAR);
+  if (calibData.phase === 'baseline') {
+    calibData.baseline.leftSamples.push(lEAR);
+    calibData.baseline.rightSamples.push(rEAR);
+  }
+}
+
+// ─── Wink detection (game loop) ──────────────────────────────────────────────
+function processEARs(lEAR, rEAR) {
+  if (!gameActive) return;
+
+  pushEAR('left',  lEAR);
+  pushEAR('right', rEAR);
+  const sl = smoothEAR('left');
+  const sr = smoothEAR('right');
+
+  const T   = calibData.thresholds;
+  const now = Date.now();
+
+  // Determine closed/open state for each eye
+  const leftClosed  = lEAR < T.left.closed;
+  const rightClosed = rEAR < T.right.closed;
+
+  // ── Double-blink / simultaneous wink guard ─────────────────────────────────
+  // If both eyes are simultaneously below their closed threshold this is a
+  // bilateral blink (or a simultaneous double-wink). Mark both gestures as
+  // tainted so they cannot score when their eye reopens.
+  if (leftClosed && rightClosed) {
+    // Taint any in-progress gesture on BOTH sides
+    if (eyeState.left.closed)  eyeState.left.tainted  = true;
+    if (eyeState.right.closed) eyeState.right.tainted = true;
+    // Also set closed flags so the reopen path runs correctly
+    eyeState.left.closed  = true;
+    eyeState.right.closed = true;
+    return;  // nothing to score this frame
+  }
+
+  // ── EAR delta ─────────────────────────────────────────────────────────────
+  // Raw asymmetry between the two eyes (used for reset detection below)
+  const earDelta = Math.abs(lEAR - rEAR);
+
+  // ── Reset gate ────────────────────────────────────────────────────────────
+  // When delta drops back to the symmetric floor, both eyes are open again.
+  // Clear the needsReset lock so the next wink on either side can score.
+  const DELTA_RESET = 0.05;
+  if (earDelta <= DELTA_RESET) {
+    eyeState.left.needsReset  = false;
+    eyeState.right.needsReset = false;
+  }
+
+  // ── Left wink ─────────────────────────────────────────────────────────────
+  // Trigger:  raw left EAR below closed threshold
+  // Validity: smoothed right EAR above 75 % of its open baseline (otherMin)
+  //           — relaxed from 95 % so quick winks aren't accidentally blocked.
+  const rightOpen = sr > T.right.otherMin;
+
+  if (leftClosed && rightOpen) {
+    // Start or continue the left-wink gesture
+    eyeState.left.closed = true;
+    // If right eye also dropped below its threshold at some earlier frame
+    // the bilateral check above would have set tainted already; nothing extra needed.
+  } else if (!leftClosed && eyeState.left.closed) {
+    // Left eye just reopened — attempt to score
+    const canScore =
+      !eyeState.left.tainted &&
+      !eyeState.left.needsReset &&
+      (now - eyeState.left.lastWinkTs > WINK_DEBOUNCE_MS);
+    if (canScore) {
+      registerWink('LEFT');
+      eyeState.left.lastWinkTs = now;
+      eyeState.left.needsReset = true;  // prevent immediate re-trigger
+    }
+    eyeState.left.closed  = false;
+    eyeState.left.tainted = false;
+  } else if (!leftClosed) {
+    // Eye is open and was not in a gesture — just clear state
+    eyeState.left.closed  = false;
+    eyeState.left.tainted = false;
+  }
+
+  // ── Right wink ────────────────────────────────────────────────────────────
+  // Mirror of left-wink logic
+  const leftOpen = sl > T.left.otherMin;
+
+  if (rightClosed && leftOpen) {
+    eyeState.right.closed = true;
+  } else if (!rightClosed && eyeState.right.closed) {
+    const canScore =
+      !eyeState.right.tainted &&
+      !eyeState.right.needsReset &&
+      (now - eyeState.right.lastWinkTs > WINK_DEBOUNCE_MS);
+    if (canScore) {
+      registerWink('RIGHT');
+      eyeState.right.lastWinkTs = now;
+      eyeState.right.needsReset = true;
+    }
+    eyeState.right.closed  = false;
+    eyeState.right.tainted = false;
+  } else if (!rightClosed) {
+    eyeState.right.closed  = false;
+    eyeState.right.tainted = false;
+  }
+}
+
+function registerWink(side) {
+  winkCount++;
+  updateWinkUI();
+  triggerWinkFlash(side);
+}
+
+function updateWinkUI() {
+  winkCountDisplay.textContent = winkCount;
+  winkCountDisplay.classList.remove('pop');
+  void winkCountDisplay.offsetWidth;
+  winkCountDisplay.classList.add('pop');
+  const pct = Math.min(Math.floor(winkCount / 3), MAX_DISCOUNT_PCT);
+  liveDiscount.textContent = `${pct}% Off`;
+}
+
+function triggerWinkFlash(side) {
+  videoWrapper.classList.add('wink-flash');
+  setTimeout(() => videoWrapper.classList.remove('wink-flash'), 350);
+  winkIndicator.textContent = side === 'LEFT' ? '👈 LEFT WINK!' : 'RIGHT WINK! 👉';
+  winkIndicator.classList.add('show');
+  setTimeout(() => winkIndicator.classList.remove('show'), 500);
+}
+
+// ─── EAR debug bars ──────────────────────────────────────────────────────────
+function updateEARBars(lEAR, rEAR) {
+  const EAR_MAX = 0.45;
+  earBarLeft.style.width  = `${Math.min(100, (lEAR / EAR_MAX) * 100)}%`;
+  earBarRight.style.width = `${Math.min(100, (rEAR / EAR_MAX) * 100)}%`;
+  earValLeft.textContent  = lEAR.toFixed(2);
+  earValRight.textContent = rEAR.toFixed(2);
+  const T = calibData.thresholds;
+  earBarLeft.style.background  = lEAR < T.left.closed  ? '#ff4444' : lEAR > T.left.open  ? '#44ff88' : 'linear-gradient(90deg,#c800ff,#ff5252)';
+  earBarRight.style.background = rEAR < T.right.closed ? '#ff4444' : rEAR > T.right.open ? '#44ff88' : 'linear-gradient(90deg,#c800ff,#ff5252)';
+}
+
+// ─── MediaPipe setup ─────────────────────────────────────────────────────────
+function initFaceMesh() {
+  faceMesh = new FaceMesh({
+    locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`,
+  });
+  faceMesh.setOptions({
+    maxNumFaces: 1, refineLandmarks: true,
+    minDetectionConfidence: 0.55, minTrackingConfidence: 0.55,
+  });
+  faceMesh.onResults(onFaceMeshResults);
+}
+
+let faceDetected = false;
+
+function onFaceMeshResults(results) {
+  if (canvasEl.width !== videoEl.videoWidth || canvasEl.height !== videoEl.videoHeight) {
+    canvasEl.width  = videoEl.videoWidth  || 640;
+    canvasEl.height = videoEl.videoHeight || 480;
+  }
+  ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+
+  const distWarning  = document.getElementById('distance-warning');
+
+  // ── No face detected ─────────────────────────────────────────────────────
+  if (!results.multiFaceLandmarks || !results.multiFaceLandmarks.length) {
+    faceDetected = false;
+    window._faceInRange = false;
+    if (gameActive || calibActive) {
+      distWarning.classList.remove('hidden');
+      distWarning.classList.add('flex');
+    }
+    if (gameActive) trackingStatus.textContent = '⚠️ No face - look into the camera';
+    return;
+  }
+
+  faceDetected = true;
+  const landmarks = results.multiFaceLandmarks[0];
+
+  // ── Distance check (eye-to-eye span) ─────────────────────────────────────
+  const dx      = landmarks[263].x - landmarks[33].x;
+  const dy      = landmarks[263].y - landmarks[33].y;
+  const eyeDist = Math.hypot(dx, dy);
+
+  if (eyeDist < 0.14) {
+    window._faceInRange = false;
+    if (gameActive || calibActive) {
+      distWarning.classList.remove('hidden');
+      distWarning.classList.add('flex');
+    }
+    return;
+  }
+  window._faceInRange = true;
+  distWarning.classList.add('hidden');
+  distWarning.classList.remove('flex');
+
+  const rawL = computeEAR(landmarks, LEFT_EYE_IDX);
+  const rawR = computeEAR(landmarks, RIGHT_EYE_IDX);
+
+  if (gameActive) {
+    trackingStatus.textContent =
+      `✅ Face tracked | EAR L:${rawL.toFixed(2)} R:${rawR.toFixed(2)}`;
+  }
+
+  updateEARBars(rawL, rawR);
+
+  if (calibActive) {
+    onCalibFrame(rawL, rawR);
+  } else {
+    processEARs(rawL, rawR);
+  }
+
+  drawEyePoints(landmarks);
+}
+
+function drawEyePoints(landmarks) {
+  const W = canvasEl.width, H = canvasEl.height;
+  const dot = (lm, color) => {
+    ctx.beginPath();
+    ctx.arc(lm.x*W, lm.y*H, 2.5, 0, Math.PI*2);
+    ctx.fillStyle = color; ctx.fill();
+  };
+  [386,374,373,380,385,387,362,263,388,390,382,381,384].forEach(i => dot(landmarks[i], 'rgba(200,0,255,0.8)'));
+  [159,145,144,153,158,160,33,133,161,163,154,155,157].forEach(i => dot(landmarks[i], 'rgba(255,255,255,0.8)'));
+}
+
+// ─── Camera ──────────────────────────────────────────────────────────────────
+async function startCamera() {
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode:'user', width:{ideal:640}, height:{ideal:480}, frameRate:{ideal:30} },
+    audio: false,
+  });
+  videoEl.srcObject = stream;
+  await new Promise(r => { videoEl.onloadedmetadata = r; });
+  await videoEl.play();
+  return stream;
+}
+
+// ─── Timer ───────────────────────────────────────────────────────────────────
+function startTimer() {
+  timeLeft = GAME_DURATION_S;
+  updateTimerUI();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerUI();
+    if (timeLeft <= 0) { clearInterval(timerInterval); endGame(); }
+  }, 1000);
+}
+
+function updateTimerUI() {
+  timerText.textContent    = timeLeft;
+  const pct                = (timeLeft / GAME_DURATION_S) * 100;
+  timerBarFill.style.width = `${pct}%`;
+  if (pct > 60)      timerBarFill.style.background = 'linear-gradient(90deg,#ff5252,#ff7043,#c800ff)';
+  else if (pct > 25) timerBarFill.style.background = 'linear-gradient(90deg,#ff8800,#ff7043)';
+  else               timerBarFill.style.background = 'linear-gradient(90deg,#ff2244,#ff6600)';
+  if (timeLeft <= 10) {
+    timerText.style.color      = '#ff4444';
+    timerText.style.textShadow = '0 0 20px rgba(255,68,68,0.9)';
+    timerText.style.animation  = 'glowPulse 0.5s ease-in-out infinite';
+  }
+}
+
+// ─── Buzzer ──────────────────────────────────────────────────────────────────
+function playBuzzer() {
+  try {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const gn = ac.createGain(); gn.connect(ac.destination);
+    [[880,0,0.18],[660,0.2,0.18],[440,0.4,0.35]].forEach(([freq,start,dur]) => {
+      const osc = ac.createOscillator(); osc.type='square'; osc.frequency.value=freq;
+      const g   = ac.createGain();
+      g.gain.setValueAtTime(0.35, ac.currentTime+start);
+      g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+start+dur);
+      osc.connect(g); g.connect(gn);
+      osc.start(ac.currentTime+start); osc.stop(ac.currentTime+start+dur+0.05);
+    });
+  } catch(_) {}
+  buzzerOverlay.classList.remove('flash');
+  void buzzerOverlay.offsetWidth;
+  buzzerOverlay.classList.add('flash');
+}
+
+// ─── Confetti ────────────────────────────────────────────────────────────────
+let confettiInterval = null;
+const CONFETTI_COLORS = ['#ff5252','#ff7043','#c800ff','#ff44aa','#44ffcc','#500073','#ffffff'];
+
+function createConfettiBurst() {
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    const color = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+    const dur   = 2.5 + Math.random() * 2;
+    const delay = Math.random() * 1.5;
+    el.style.cssText = `left:${Math.random()*100}vw;top:-20px;
+      width:${6+Math.random()*10}px;height:${8+Math.random()*12}px;
+      background:${color};transform:rotate(${Math.random()*360}deg);
+      --duration:${dur}s;--delay:${delay}s;
+      animation-delay:${delay}s;animation-duration:${dur}s;`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), (dur + delay + 0.5) * 1000);
+  }
+}
+
+function launchConfetti() {
+  document.querySelectorAll('.confetti-piece').forEach(el => el.remove());
+  createConfettiBurst(); // Initial burst
+  if (confettiInterval) clearInterval(confettiInterval);
+  confettiInterval = setInterval(createConfettiBurst, 1500);
+}
+
+function stopConfetti() {
+  if (confettiInterval) clearInterval(confettiInterval);
+  document.querySelectorAll('.confetti-piece').forEach(el => el.remove());
+}
+
+// ─── Utility ─────────────────────────────────────────────────────────────────
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// ─── Screen transitions ──────────────────────────────────────────────────────
+function showScreen(id) {
+  [screenWelcome, screenGame, screenReward].forEach(s => s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+// ─── 3-2-1 countdown ─────────────────────────────────────────────────────────
+async function countdown321() {
+  for (const msg of ['3…','2…','1…','GO! 🟡']) {
+    trackingStatus.textContent = msg;
+    await sleep(700);
+  }
+}
+
+// ─── Flow: Start challenge ───────────────────────────────────────────────────
+async function startChallenge() {
+  const btn = document.getElementById('btn-start');
+  btn.disabled = true; btn.textContent = '⏳ Starting…';
+  welcomeError.classList.add('hidden');
+
+  try {
+    showScreen('screen-game');
+    trackingStatus.textContent = '🧠 Loading face-tracking model…';
+
+    // NOTE: The MediaPipe Camera utility manages getUserMedia internally.
+    // Do NOT call startCamera() here - that would open a second competing stream.
+    initFaceMesh();
+
+    camera = new Camera(videoEl, {
+      onFrame: async () => {
+        if (faceMesh && videoEl.readyState >= 2) await faceMesh.send({ image: videoEl });
+      },
+      width: 640, height: 480,
+    });
+    await camera.start();
+
+    await sleep(1500);   // warm-up: let FaceMesh initialise and first frames arrive
+    window._calibFaceReady = false;
+    trackingStatus.textContent = '🎯 Starting calibration…';
+
+    await startCalibration();
+
+  } catch (err) {
+    showScreen('screen-welcome');
+    btn.disabled = false; btn.textContent = '🚀 Start Challenge';
+    welcomeError.textContent = `❌ ${err.message || 'Camera access required.'}`;
+    welcomeError.classList.remove('hidden');
+    console.error(err);
+  }
+}
+
+// ─── Begin game (after calibration or skip) ──────────────────────────────────
+async function beginGame() {
+  winkCount = 0;
+  eyeState.left.closed      = false;
+  eyeState.right.closed     = false;
+  eyeState.left.lastWinkTs  = 0;
+  eyeState.right.lastWinkTs = 0;
+  eyeState.left.needsReset  = false;
+  eyeState.right.needsReset = false;
+  earBuffer.left  = [];
+  earBuffer.right = [];
+
+  updateWinkUI();
+  trackingStatus.textContent = '✅ Ready!';
+  await countdown321();
+
+  gameActive = true;
+  startTimer();
+  trackingStatus.textContent = '✅ Face detected - keep winking!';
+}
+
+// ─── Flow: End game ───────────────────────────────────────────────────────────
+function endGame() {
+  gameActive = false;
+  playBuzzer();
+
+  const finalWinks    = winkCount;
+  const finalDiscount = Math.min(Math.floor(finalWinks / 3), MAX_DISCOUNT_PCT);
+  promoCode           = `ZEPTOWINK${finalDiscount}`;
+
+  resultWinkCount.textContent  = finalWinks;
+  resultDiscount.textContent   = `${finalDiscount}% OFF`;
+  promoCodeDisplay.textContent = promoCode;
+
+  setTimeout(() => { showScreen('screen-reward'); launchConfetti(); }, 900);
+}
+
+// ─── Flow: Reset ─────────────────────────────────────────────────────────────
+function resetToWelcome() {
+  clearInterval(timerInterval);
+  gameActive  = false;
+  calibActive = false;
+  winkCount   = 0;
+  window._calibFaceReady = false;
+  stopConfetti();
+
+  // Stop the Camera utility's internal stream (it manages its own getUserMedia)
+  if (videoEl.srcObject) { videoEl.srcObject.getTracks().forEach(t => t.stop()); videoEl.srcObject = null; }
+  if (camera)            { try { camera.stop(); } catch(_) {} camera = null; }
+  if (faceMesh)          { try { faceMesh.close(); } catch(_) {} faceMesh = null; }
+  cameraStream = null;
+
+  winkCountDisplay.textContent = '0';
+  timerText.textContent        = GAME_DURATION_S;
+  timerBarFill.style.width     = '100%';
+  liveDiscount.textContent     = '0% Off';
+  timerText.style.color        = '#ffffff';
+  timerText.style.textShadow   = '0 0 15px rgba(255,255,255,0.5)';
+  timerText.style.animation    = 'none';
+  recalibrateBtn.style.display = 'none';
+  calibOverlay.classList.add('hidden');
+
+  const btn = document.getElementById('btn-start');
+  btn.disabled = false; btn.textContent = '🚀 Start Challenge';
+  showScreen('screen-welcome');
+}
+
+// ─── Copy promo code ──────────────────────────────────────────────────────────
+async function copyPromoCode() {
+  const code = promoCodeDisplay.textContent || promoCode;
+  try {
+    await navigator.clipboard.writeText(code);
+  } catch(_) {
+    const ta = document.createElement('textarea');
+    ta.value = code; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+  }
+  const toast = document.getElementById('copy-toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2200);
+}
+</script>
+</body>
+</html>
