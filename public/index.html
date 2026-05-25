@@ -341,6 +341,30 @@
       opacity: 1;
     }
 
+    /* ── Double-blink warning overlay ── */
+    #blink-warning {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 160, 0, 0.92);
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 0.82rem;
+      letter-spacing: 1.2px;
+      padding: 5px 16px;
+      border-radius: 999px;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      white-space: nowrap;
+      z-index: 10;
+      pointer-events: none;
+      box-shadow: 0 2px 12px rgba(255,160,0,0.5);
+    }
+    #blink-warning.show {
+      opacity: 1;
+    }
+
     /* ── EAR debug bars ── */
     .ear-bar-wrap {
       display: flex;
@@ -850,6 +874,9 @@
       <!-- Wink indicator popup -->
       <div id="wink-indicator">👁️ WINK!</div>
 
+      <!-- Double-blink warning -->
+      <div id="blink-warning">Wink one eye only!</div>
+
       <!-- Distance warning overlay -->
       <div id="distance-warning" class="hidden absolute inset-0 z-[100] flex-col items-center justify-center text-white text-center backdrop-blur-md rounded-[20px]" style="background: rgba(255,82,82,0.85);">
         <div class="text-6xl mb-2">👀</div>
@@ -1343,12 +1370,13 @@ function processEARs(lEAR, rEAR) {
   // bilateral blink (or a simultaneous double-wink). Mark both gestures as
   // tainted so they cannot score when their eye reopens.
   if (leftClosed && rightClosed) {
-    // Taint any in-progress gesture on BOTH sides
-    if (eyeState.left.closed)  eyeState.left.tainted  = true;
-    if (eyeState.right.closed) eyeState.right.tainted = true;
+    // Taint BOTH sides unconditionally to prevent registration when they reopen
+    eyeState.left.tainted  = true;
+    eyeState.right.tainted = true;
     // Also set closed flags so the reopen path runs correctly
     eyeState.left.closed  = true;
     eyeState.right.closed = true;
+    triggerDoubleBlink();
     return;  // nothing to score this frame
   }
 
@@ -1423,6 +1451,23 @@ function registerWink(side) {
   winkCount++;
   updateWinkUI();
   triggerWinkFlash(side);
+}
+
+// ─── Double-blink warning ────────────────────────────────────────────────────
+let _doubleBlink_hideTimer = null;
+let _doubleBlink_lastTs    = 0;
+const DOUBLE_BLINK_COOLDOWN_MS = 800; // don't re-show more than once per 800ms
+
+const blinkWarning = document.getElementById('blink-warning');
+
+function triggerDoubleBlink() {
+  const now = Date.now();
+  if (now - _doubleBlink_lastTs < DOUBLE_BLINK_COOLDOWN_MS) return;
+  _doubleBlink_lastTs = now;
+
+  blinkWarning.classList.add('show');
+  clearTimeout(_doubleBlink_hideTimer);
+  _doubleBlink_hideTimer = setTimeout(() => blinkWarning.classList.remove('show'), 900);
 }
 
 function updateWinkUI() {
