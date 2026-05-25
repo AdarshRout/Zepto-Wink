@@ -143,8 +143,6 @@
         0 0 80px rgba(80,0,115,0.3);
     }
 
-
-
     /* ── Video container ── */
     #video-wrapper {
       position: relative;
@@ -676,6 +674,69 @@
       padding: 0;
     }
     #btn-recalibrate:hover { color: rgba(255,255,255,0.9); }
+
+    /* ── Wink eye animation (welcome screen) ── */
+    .wink-eyes { display:flex; gap:18px; align-items:center; justify-content:center; margin-bottom:4px; }
+    .wink-eye {
+      position: relative;
+      width: 44px;
+      height: 30px;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 0 18px rgba(200,0,255,0.55), 0 0 6px rgba(200,0,255,0.3);
+      background: #fff;
+    }
+    .wink-iris {
+      position: absolute;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 38%, #7c3aed, #4c1d95 60%, #1e0040);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .wink-iris::after {
+      content:'';
+      position:absolute;
+      width:11px; height:11px;
+      border-radius:50%;
+      background:#000;
+      top:50%; left:50%;
+      transform:translate(-50%,-50%);
+    }
+    .wink-iris::before {
+      content:'';
+      position:absolute;
+      width:6px; height:6px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.75);
+      top:18%; left:22%;
+    }
+    .wink-lid {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 100%;
+      background: linear-gradient(180deg, #2a003d 60%, #500073);
+      border-radius: 0 0 50% 50%;
+      transform-origin: top center;
+      animation: lidClose 1.6s ease-in-out infinite;
+    }
+    .wink-eye.left  .wink-lid { animation-name: lidClose; animation-delay: 0s; }
+    .wink-eye.right .wink-lid { animation-name: lidClose; animation-delay: -0.8s; }
+    @keyframes lidClose {
+      0%   { transform: scaleY(0.05); }
+      30%  { transform: scaleY(1);    }
+      50%  { transform: scaleY(1);    }
+      80%  { transform: scaleY(0.05); }
+      100% { transform: scaleY(0.05); }
+    }
+    .wink-lid::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 10%; right: 10%;
+      height: 5px;
+      border-radius: 0 0 50% 50%;
+      background: #1a0028;
+    }
   </style>
 </head>
 
@@ -695,84 +756,6 @@
      ════════════════════════════════════════════════════════ -->
 <div id="screen-welcome" class="screen">
   <div class="gloss-card w-full max-w-lg p-8 sm:p-10 text-center" style="animation: bounceIn 0.6s ease forwards;">
-
-    <!-- Logo — alternating wink eyes -->
-    <style>
-      .wink-eyes { display:flex; gap:18px; align-items:center; justify-content:center; margin-bottom:4px; }
-
-      /* Each eye is a clipped oval */
-      .wink-eye {
-        position: relative;
-        width: 44px;
-        height: 30px;
-        border-radius: 50%;
-        overflow: hidden;
-        box-shadow: 0 0 18px rgba(200,0,255,0.55), 0 0 6px rgba(200,0,255,0.3);
-        background: #fff;
-      }
-
-      /* Iris + pupil sit centered inside the sclera */
-      .wink-iris {
-        position: absolute;
-        width: 20px; height: 20px;
-        border-radius: 50%;
-        background: radial-gradient(circle at 38% 38%, #7c3aed, #4c1d95 60%, #1e0040);
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-      }
-      .wink-iris::after {          /* pupil */
-        content:'';
-        position:absolute;
-        width:11px; height:11px;
-        border-radius:50%;
-        background:#000;
-        top:50%; left:50%;
-        transform:translate(-50%,-50%);
-      }
-      .wink-iris::before {         /* specular highlight */
-        content:'';
-        position:absolute;
-        width:6px; height:6px;
-        border-radius:50%;
-        background:rgba(255,255,255,0.75);
-        top:18%; left:22%;
-      }
-
-      /* The eyelid slides DOWN to close, UP to open */
-      .wink-lid {
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 100%;
-        background: linear-gradient(180deg, #2a003d 60%, #500073);
-        border-radius: 0 0 50% 50%;
-        transform-origin: top center;
-        /* scaleY(0)=open, scaleY(1)=closed */
-        animation: lidClose 1.6s ease-in-out infinite;
-      }
-
-      /* Left eye: starts open → closes → opens */
-      .wink-eye.left  .wink-lid { animation-name: lidClose; animation-delay: 0s; }
-      /* Right eye: starts closed → opens → closes (180° offset) */
-      .wink-eye.right .wink-lid { animation-name: lidClose; animation-delay: -0.8s; }
-
-      @keyframes lidClose {
-        0%   { transform: scaleY(0.05); }   /* open  */
-        30%  { transform: scaleY(1);    }   /* fully closed */
-        50%  { transform: scaleY(1);    }   /* hold closed  */
-        80%  { transform: scaleY(0.05); }   /* open  */
-        100% { transform: scaleY(0.05); }   /* open  */
-      }
-
-      /* Lashes on the lid edge */
-      .wink-lid::after {
-        content: '';
-        position: absolute;
-        bottom: -2px; left: 10%; right: 10%;
-        height: 5px;
-        border-radius: 0 0 50% 50%;
-        background: #1a0028;
-      }
-    </style>
 
     <div class="mb-6 flex flex-col items-center gap-2">
       <!-- Zepto brand image -->
@@ -987,7 +970,6 @@
       </button>
     </div>
 
-
   </div>
 </div>
 
@@ -1035,802 +1017,10 @@
 </div>
 
 <!-- ════════════════════════════════════════════════════════
-     JAVASCRIPT - CORE LOGIC
+     MODULAR SCRIPTS (order matters: calibration before tracking)
      ════════════════════════════════════════════════════════ -->
-<script>
-'use strict';
+<script src="calibration.js"></script>
+<script src="tracking.js"></script>
 
-// ─── Constants (fallback - replaced by calibration) ──────────────────────────
-const GAME_DURATION_S   = 45;
-const MAX_DISCOUNT_PCT  = 60;
-const SMOOTH_FRAMES     = 3;     // moving-average buffer depth (3 = ~100ms lag at 30fps)
-
-// Fallback thresholds used when calibration is skipped
-const FB_CLOSED = 0.30;
-const FB_OPEN   = 0.35;
-const FB_OTHER  = 0.22;
-
-const WINK_DEBOUNCE_MS  = 280;   // min ms between registered winks
-
-// SVG ring constants (circumference of r=35 circle ≈ 220)
-const RING_CIRC = 2 * Math.PI * 35; // 219.9
-
-// MediaPipe landmark indices
-// EAR: (||p2-p6|| + ||p3-p5||) / (2 * ||p1-p4||)
-const LEFT_EYE_IDX  = { p1: 263, p2: 387, p3: 386, p4: 362, p5: 373, p6: 380 };
-const RIGHT_EYE_IDX = { p1: 33,  p2: 160, p3: 159, p4: 133, p5: 144, p6: 153 };
-
-// ─── Calibration data ────────────────────────────────────────────────────────
-const calibData = {
-  phase: 'idle',   // idle | baseline | done
-  baseline: { leftSamples: [], rightSamples: [] },
-  thresholds: {
-    left:  { closed: FB_CLOSED, open: FB_OPEN, otherMin: FB_OTHER },
-    right: { closed: FB_CLOSED, open: FB_OPEN, otherMin: FB_OTHER },
-  },
-  calibrated: false,
-};
-
-// ─── EAR smoothing buffers ────────────────────────────────────────────────────
-const earBuffer = { left: [], right: [] };
-
-function pushEAR(side, val) {
-  earBuffer[side].push(val);
-  if (earBuffer[side].length > SMOOTH_FRAMES) earBuffer[side].shift();
-}
-function smoothEAR(side) {
-  const buf = earBuffer[side];
-  if (!buf.length) return 0.35;
-  return buf.reduce((a, b) => a + b, 0) / buf.length;
-}
-
-// ─── State ───────────────────────────────────────────────────────────────────
-let winkCount     = 0;
-let timerInterval = null;
-let timeLeft      = GAME_DURATION_S;
-let gameActive    = false;
-let calibActive   = false;
-let faceMesh      = null;
-let camera        = null;
-let promoCode     = '';
-let cameraStream  = null;
-
-let pendingWink   = null;
-const CONFIRM_DELAY_MS = 150; // buffer window to verify a single eye wink and filter out blinks
-
-const eyeState = {
-  left:  { closed: false, lastWinkTs: 0, needsReset: false, tainted: false },
-  right: { closed: false, lastWinkTs: 0, needsReset: false, tainted: false },
-};
-
-// ─── DOM refs ────────────────────────────────────────────────────────────────
-const screenWelcome       = document.getElementById('screen-welcome');
-const screenGame          = document.getElementById('screen-game');
-const screenReward        = document.getElementById('screen-reward');
-const videoEl             = document.getElementById('webcam-video');
-const canvasEl            = document.getElementById('overlay-canvas');
-const ctx                 = canvasEl.getContext('2d');
-const videoWrapper        = document.getElementById('video-wrapper');
-const winkCountDisplay    = document.getElementById('wink-count-display');
-const timerText           = document.getElementById('timer-text');
-const timerBarFill        = document.getElementById('timer-bar-fill');
-const liveDiscount        = document.getElementById('live-discount');
-const trackingStatus      = document.getElementById('tracking-status');
-const winkIndicator       = document.getElementById('wink-indicator');
-const resultWinkCount     = document.getElementById('result-wink-count');
-const resultDiscount      = document.getElementById('result-discount');
-const resultEquation      = document.getElementById('result-equation');
-const promoCodeDisplay    = document.getElementById('promo-code-display');
-const earBarLeft          = document.getElementById('ear-bar-left');
-const earBarRight         = document.getElementById('ear-bar-right');
-const earValLeft          = document.getElementById('ear-val-left');
-const earValRight         = document.getElementById('ear-val-right');
-const welcomeError        = document.getElementById('welcome-error');
-const buzzerOverlay       = document.getElementById('buzzer-overlay');
-// Calibration DOM
-const calibOverlay        = document.getElementById('calib-overlay');
-const calibIcon           = document.getElementById('calib-icon');
-const calibTitle          = document.getElementById('calib-title');
-const calibSubtitle       = document.getElementById('calib-subtitle');
-const calibRingFill       = document.getElementById('calib-ring-fill');
-const calibRingSec        = document.getElementById('calib-ring-sec');
-const calibPillLeft       = document.getElementById('calib-pill-left');
-const calibPillRight      = document.getElementById('calib-pill-right');
-const calibEarLeft        = document.getElementById('calib-ear-left');
-const calibEarRight       = document.getElementById('calib-ear-right');
-const calibStatus         = document.getElementById('calib-status');
-const recalibrateBtn      = document.getElementById('btn-recalibrate');
-
-// ─── EAR calculation ─────────────────────────────────────────────────────────
-function euclidean(a, b) {
-  return Math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2);
-}
-function computeEAR(landmarks, idx) {
-  const p1=landmarks[idx.p1], p2=landmarks[idx.p2], p3=landmarks[idx.p3];
-  const p4=landmarks[idx.p4], p5=landmarks[idx.p5], p6=landmarks[idx.p6];
-  const h = euclidean(p1, p4);
-  if (h < 0.001) return 0.35;
-  return (euclidean(p2,p6) + euclidean(p3,p5)) / (2.0 * h);
-}
-
-// ─── Calibration UI helpers ───────────────────────────────────────────────────
-// Single baseline phase - no wink demonstration needed.
-// Thresholds are computed as a percentage of the open-eye EAR.
-const STEP_META = [
-  {
-    dotIdx: 0, icon: '👀', title: 'EYE CALIBRATION',
-    subtitle: 'Look <span class="calib-highlight">naturally</span> at the camera. Keep <span class="calib-highlight">both eyes open</span>.',
-    durationMs: 3500, ringColor: null,
-  },
-];
-
-function setCalibDot(activeIdx) {
-  for (let i = 0; i < 3; i++) {
-    const dot = document.getElementById(`cdot-${i}`);
-    dot.className = 'calib-dot';
-    if (i < activeIdx)  dot.classList.add('done');
-    if (i === activeIdx) dot.classList.add('active');
-  }
-}
-
-function setCalibStatus(text, cls = '') {
-  calibStatus.className = '';
-  if (cls) calibStatus.classList.add(cls);
-  calibStatus.textContent = text;
-}
-
-function animateRing(durationMs, ringClass) {
-  calibRingFill.setAttribute('class', 'calib-ring-fill');
-  if (ringClass) calibRingFill.classList.add(ringClass);
-  calibRingFill.style.transition = 'none';
-  calibRingFill.style.strokeDashoffset = RING_CIRC;
-  void calibRingFill.getBoundingClientRect();
-  calibRingFill.style.transition = `stroke-dashoffset ${durationMs}ms linear`;
-  calibRingFill.style.strokeDashoffset = 0;
-}
-
-function updateCalibEarPills(lEAR, rEAR) {
-  calibEarLeft.textContent  = lEAR.toFixed(3);
-  calibEarRight.textContent = rEAR.toFixed(3);
-  // During baseline both pills show as open/active
-  calibPillLeft.className  = 'calib-ear-pill ear-open';
-  calibPillRight.className = 'calib-ear-pill ear-open';
-}
-
-// ─── Calibration state machine ───────────────────────────────────────────────
-async function startCalibration() {
-  calibActive = true;
-  calibData.phase = 'idle';
-  calibData.baseline.leftSamples  = [];
-  calibData.baseline.rightSamples = [];
-  calibData.calibrated = false;
-  earBuffer.left  = [];
-  earBuffer.right = [];
-
-  calibOverlay.classList.remove('hidden', 'fade-out');
-  setCalibStatus('⏳ Waiting for face…');
-  setCalibDot(0);
-
-  // Wait until face is detected (poll every 100ms)
-  await new Promise(resolve => {
-    const poll = setInterval(() => {
-      if (window._calibFaceReady) { clearInterval(poll); resolve(); }
-    }, 100);
-  });
-
-  // Single baseline phase: just look naturally at the camera
-  await runCalibPhase(0, 'baseline');
-
-  // Compute thresholds from baseline EAR (percentage-based - no wink demo needed)
-  finishCalibration();
-
-  // Success feedback
-  setCalibStatus('✅ Calibration complete!', 'success');
-  calibRingFill.setAttribute('class', 'calib-ring-fill success');
-  calibRingFill.style.strokeDashoffset = 0;
-  for (let i = 0; i < 3; i++) document.getElementById(`cdot-${i}`).className = 'calib-dot done';
-  await sleep(800);
-
-  calibOverlay.classList.add('fade-out');
-  await sleep(450);
-  calibOverlay.classList.add('hidden');
-  calibOverlay.classList.remove('fade-out');
-  calibActive = false;
-  recalibrateBtn.style.display = 'inline';
-
-  await beginGame();
-}
-
-function runCalibPhase(stepIdx, phaseId) {
-  return new Promise(resolve => {
-    const meta = STEP_META[stepIdx];
-    calibData.phase = phaseId;
-
-    setCalibDot(stepIdx);
-    calibIcon.textContent    = meta.icon;
-    calibTitle.textContent   = meta.title;
-    calibSubtitle.innerHTML  = meta.subtitle;
-    
-    let timeLeftMs = meta.durationMs;
-    calibRingSec.textContent = Math.ceil(timeLeftMs / 1000);
-
-    setCalibStatus('⏺ Capturing…', 'active');
-    
-    calibRingFill.setAttribute('class', 'calib-ring-fill');
-    if (meta.ringColor) calibRingFill.classList.add(meta.ringColor);
-    calibRingFill.style.transition = 'none';
-
-    const loopMs = 100;
-    const tick = setInterval(() => {
-      if (window._faceInRange) {
-        timeLeftMs -= loopMs;
-        calibRingSec.textContent = Math.ceil(timeLeftMs / 1000);
-        
-        const progress = Math.max(0, timeLeftMs / meta.durationMs);
-        calibRingFill.style.strokeDashoffset = RING_CIRC * progress;
-        
-        if (timeLeftMs <= 0) {
-          clearInterval(tick);
-          calibRingFill.style.strokeDashoffset = 0;
-          setCalibStatus('✅ Got it!', 'success');
-          setTimeout(resolve, 350);
-        }
-      }
-    }, loopMs);
-  });
-}
-
-function finishCalibration() {
-  const avgArr = arr => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : FB_OPEN;
-  const lOpen = avgArr(calibData.baseline.leftSamples);
-  const rOpen = avgArr(calibData.baseline.rightSamples);
-
-  // A wink = target eye EAR drops to ≤85% of its natural open value (raw, not smoothed — catches quick winks).
-  // "Other eye stable" = other eye smoothed EAR stays above 75% of its natural open value
-  // (smoothed to avoid noise; 75% is lenient enough to survive mild sympathetic drops).
-  calibData.thresholds.left = {
-    closed:   lOpen * 0.85,   // raw EAR must drop below this to count as "closed"
-    open:     lOpen * 0.95,   // smoothed EAR must rise above this to register the wink
-    otherMin: rOpen * 0.75,   // right eye (smoothed) must stay above this during a left wink
-  };
-  calibData.thresholds.right = {
-    closed:   rOpen * 0.85,
-    open:     rOpen * 0.95,
-    otherMin: lOpen * 0.75,   // left eye (smoothed) must stay above this during a right wink
-  };
-
-  calibData.calibrated = true;
-
-  console.log(`[Calib] L open EAR: ${lOpen.toFixed(3)} → wink threshold < ${calibData.thresholds.left.closed.toFixed(3)}`);
-  console.log(`[Calib] R open EAR: ${rOpen.toFixed(3)} → wink threshold < ${calibData.thresholds.right.closed.toFixed(3)}`);
-}
-
-function skipCalibration() {
-  calibActive = false;
-  calibData.thresholds.left  = { closed: FB_CLOSED, open: FB_OPEN, otherMin: FB_OTHER };
-  calibData.thresholds.right = { closed: FB_CLOSED, open: FB_OPEN, otherMin: FB_OTHER };
-  // Symmetry/width baselines remain null — checks fall back to absolute thresholds
-  calibData.calibrated = false;
-  calibOverlay.classList.add('hidden');
-  recalibrateBtn.style.display = 'inline';
-  beginGame();
-}
-
-async function restartCalibration() {
-  try {
-    if (gameActive) { clearInterval(timerInterval); gameActive = false; }
-    // Reset timer display so the bar doesn't show stale time
-    timeLeft = GAME_DURATION_S;
-    updateTimerUI();
-    earBuffer.left  = [];
-    earBuffer.right = [];
-    eyeState.left.closed       = false;
-    eyeState.right.closed      = false;
-    eyeState.left.needsReset   = false;
-    eyeState.right.needsReset  = false;
-    eyeState.left.tainted      = false;
-    eyeState.right.tainted     = false;
-    window._calibFaceReady = false;
-    recalibrateBtn.style.display = 'none';
-    winkCount = 0;
-    pendingWink = null;
-    updateWinkUI();
-    await startCalibration();
-  } catch (err) {
-    console.error('[Recalibrate] Error during recalibration:', err);
-    // Fallback: use hardcoded thresholds and start the game anyway
-    skipCalibration();
-  }
-}
-
-// ─── Calibration frame handler ───────────────────────────────────────────────
-function onCalibFrame(lEAR, rEAR) {
-  window._calibFaceReady = true;
-  updateCalibEarPills(lEAR, rEAR);
-  if (calibData.phase === 'baseline') {
-    calibData.baseline.leftSamples.push(lEAR);
-    calibData.baseline.rightSamples.push(rEAR);
-  }
-}
-
-// ─── Wink detection (game loop) ──────────────────────────────────────────────
-function processEARs(lEAR, rEAR) {
-  if (!gameActive) return;
-
-  pushEAR('left',  lEAR);
-  pushEAR('right', rEAR);
-  const sl = smoothEAR('left');
-  const sr = smoothEAR('right');
-
-  const T   = calibData.thresholds;
-  const now = Date.now();
-
-  // Determine closed/open state for each eye
-  const leftClosed  = lEAR < T.left.closed;
-  const rightClosed = rEAR < T.right.closed;
-
-  // ── Pending wink confirmation ──────────────────────────────────────────────
-  // After an eye reopens from a wink, we wait CONFIRM_DELAY_MS to verify the
-  // other eye does not also close (which indicates a bilateral blink/wink).
-  if (pendingWink) {
-    const otherClosed = pendingWink.side === 'LEFT' ? (rEAR < T.right.closed) : (lEAR < T.left.closed);
-    if (otherClosed) {
-      // Other eye closed during the confirmation window -> bilateral blink!
-      const cancelledSide = pendingWink.side.toLowerCase();
-      pendingWink = null;
-      eyeState.left.tainted = true;
-      eyeState.right.tainted = true;
-      eyeState[cancelledSide].needsReset = true;
-      triggerDoubleBlink();
-      return;
-    }
-    if (now - pendingWink.ts > CONFIRM_DELAY_MS) {
-      // Confirmed genuine single-eye wink!
-      registerWink(pendingWink.side);
-      const side = pendingWink.side.toLowerCase();
-      eyeState[side].lastWinkTs = now;
-      eyeState[side].needsReset = true;
-      pendingWink = null;
-    }
-  }
-
-  // ── Double-blink / simultaneous wink guard ─────────────────────────────────
-  // If both eyes are simultaneously below their closed threshold, taint both.
-  if (leftClosed && rightClosed) {
-    pendingWink = null;
-    eyeState.left.tainted  = true;
-    eyeState.right.tainted = true;
-    eyeState.left.closed  = true;
-    eyeState.right.closed = true;
-    triggerDoubleBlink();
-    return;
-  }
-
-  // ── EAR delta ─────────────────────────────────────────────────────────────
-  // Raw asymmetry between the two eyes (used for reset detection below)
-  const earDelta = Math.abs(lEAR - rEAR);
-
-  // ── Reset gate ────────────────────────────────────────────────────────────
-  // When delta drops back to the symmetric floor, both eyes are open again.
-  // Clear the needsReset lock so the next wink on either side can score.
-  const DELTA_RESET = 0.05;
-  if (earDelta <= DELTA_RESET) {
-    eyeState.left.needsReset  = false;
-    eyeState.right.needsReset = false;
-  }
-
-  // ── Left wink ─────────────────────────────────────────────────────────────
-  // Trigger:  raw left EAR below closed threshold
-  // Validity: smoothed right EAR above 75 % of its open baseline (otherMin)
-  const rightOpen = sr > T.right.otherMin;
-
-  if (leftClosed && rightOpen) {
-    // Start or continue the left-wink gesture
-    eyeState.left.closed = true;
-  } else if (!leftClosed && eyeState.left.closed) {
-    // Left eye just reopened — queue for confirmation instead of scoring immediately
-    const canScore =
-      !eyeState.left.tainted &&
-      !eyeState.left.needsReset &&
-      (now - eyeState.left.lastWinkTs > WINK_DEBOUNCE_MS);
-    if (canScore && !pendingWink) {
-      pendingWink = { side: 'LEFT', ts: now };
-    }
-    eyeState.left.closed  = false;
-    eyeState.left.tainted = false;
-  } else if (!leftClosed) {
-    // Eye is open and was not in a gesture — just clear state
-    eyeState.left.closed  = false;
-    eyeState.left.tainted = false;
-  }
-
-  // ── Right wink ────────────────────────────────────────────────────────────
-  // Mirror of left-wink logic
-  const leftOpen = sl > T.left.otherMin;
-
-  if (rightClosed && leftOpen) {
-    eyeState.right.closed = true;
-  } else if (!rightClosed && eyeState.right.closed) {
-    // Right eye just reopened — queue for confirmation
-    const canScore =
-      !eyeState.right.tainted &&
-      !eyeState.right.needsReset &&
-      (now - eyeState.right.lastWinkTs > WINK_DEBOUNCE_MS);
-    if (canScore && !pendingWink) {
-      pendingWink = { side: 'RIGHT', ts: now };
-    }
-    eyeState.right.closed  = false;
-    eyeState.right.tainted = false;
-  } else if (!rightClosed) {
-    eyeState.right.closed  = false;
-    eyeState.right.tainted = false;
-  }
-}
-
-function registerWink(side) {
-  winkCount++;
-  updateWinkUI();
-  triggerWinkFlash(side);
-}
-
-// ─── Double-blink warning ────────────────────────────────────────────────────
-let _doubleBlink_hideTimer = null;
-let _doubleBlink_lastTs    = 0;
-const DOUBLE_BLINK_COOLDOWN_MS = 800; // don't re-show more than once per 800ms
-
-const blinkWarning = document.getElementById('blink-warning');
-
-function triggerDoubleBlink() {
-  const now = Date.now();
-  if (now - _doubleBlink_lastTs < DOUBLE_BLINK_COOLDOWN_MS) return;
-  _doubleBlink_lastTs = now;
-
-  blinkWarning.classList.add('show');
-  clearTimeout(_doubleBlink_hideTimer);
-  _doubleBlink_hideTimer = setTimeout(() => blinkWarning.classList.remove('show'), 900);
-}
-
-function updateWinkUI() {
-  winkCountDisplay.textContent = winkCount;
-  winkCountDisplay.classList.remove('pop');
-  void winkCountDisplay.offsetWidth;
-  winkCountDisplay.classList.add('pop');
-  const pct = Math.min(Math.floor(winkCount / 3), MAX_DISCOUNT_PCT);
-  liveDiscount.textContent = `${pct}% Off`;
-}
-
-function triggerWinkFlash(side) {
-  videoWrapper.classList.add('wink-flash');
-  setTimeout(() => videoWrapper.classList.remove('wink-flash'), 350);
-  winkIndicator.textContent = side === 'LEFT' ? '👈 LEFT WINK!' : 'RIGHT WINK! 👉';
-  winkIndicator.classList.add('show');
-  setTimeout(() => winkIndicator.classList.remove('show'), 500);
-}
-
-// ─── EAR debug bars ──────────────────────────────────────────────────────────
-function updateEARBars(lEAR, rEAR) {
-  const EAR_MAX = 0.45;
-  earBarLeft.style.width  = `${Math.min(100, (lEAR / EAR_MAX) * 100)}%`;
-  earBarRight.style.width = `${Math.min(100, (rEAR / EAR_MAX) * 100)}%`;
-  earValLeft.textContent  = lEAR.toFixed(2);
-  earValRight.textContent = rEAR.toFixed(2);
-  const T = calibData.thresholds;
-  earBarLeft.style.background  = lEAR < T.left.closed  ? '#ff4444' : lEAR > T.left.open  ? '#44ff88' : 'linear-gradient(90deg,#c800ff,#ff5252)';
-  earBarRight.style.background = rEAR < T.right.closed ? '#ff4444' : rEAR > T.right.open ? '#44ff88' : 'linear-gradient(90deg,#c800ff,#ff5252)';
-}
-
-// ─── MediaPipe setup ─────────────────────────────────────────────────────────
-function initFaceMesh() {
-  faceMesh = new FaceMesh({
-    locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`,
-  });
-  faceMesh.setOptions({
-    maxNumFaces: 1, refineLandmarks: true,
-    minDetectionConfidence: 0.55, minTrackingConfidence: 0.55,
-  });
-  faceMesh.onResults(onFaceMeshResults);
-}
-
-let faceDetected = false;
-
-function onFaceMeshResults(results) {
-  if (canvasEl.width !== videoEl.videoWidth || canvasEl.height !== videoEl.videoHeight) {
-    canvasEl.width  = videoEl.videoWidth  || 640;
-    canvasEl.height = videoEl.videoHeight || 480;
-  }
-  ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
-
-  const distWarning  = document.getElementById('distance-warning');
-
-  // ── No face detected ─────────────────────────────────────────────────────
-  if (!results.multiFaceLandmarks || !results.multiFaceLandmarks.length) {
-    faceDetected = false;
-    window._faceInRange = false;
-    if (gameActive || calibActive) {
-      distWarning.classList.remove('hidden');
-      distWarning.classList.add('flex');
-    }
-    if (gameActive) trackingStatus.textContent = '⚠️ No face - look into the camera';
-    return;
-  }
-
-  faceDetected = true;
-  const landmarks = results.multiFaceLandmarks[0];
-
-  // ── Distance check (eye-to-eye span) ─────────────────────────────────────
-  const dx      = landmarks[263].x - landmarks[33].x;
-  const dy      = landmarks[263].y - landmarks[33].y;
-  const eyeDist = Math.hypot(dx, dy);
-
-  if (eyeDist < 0.14) {
-    window._faceInRange = false;
-    if (gameActive || calibActive) {
-      distWarning.classList.remove('hidden');
-      distWarning.classList.add('flex');
-    }
-    return;
-  }
-  window._faceInRange = true;
-  distWarning.classList.add('hidden');
-  distWarning.classList.remove('flex');
-
-  const rawL = computeEAR(landmarks, LEFT_EYE_IDX);
-  const rawR = computeEAR(landmarks, RIGHT_EYE_IDX);
-
-  if (gameActive) {
-    trackingStatus.textContent =
-      `✅ Face tracked | EAR L:${rawL.toFixed(2)} R:${rawR.toFixed(2)}`;
-  }
-
-  updateEARBars(rawL, rawR);
-
-  if (calibActive) {
-    onCalibFrame(rawL, rawR);
-  } else {
-    processEARs(rawL, rawR);
-  }
-
-  drawEyePoints(landmarks);
-}
-
-function drawEyePoints(landmarks) {
-  const W = canvasEl.width, H = canvasEl.height;
-  const dot = (lm, color) => {
-    ctx.beginPath();
-    ctx.arc(lm.x*W, lm.y*H, 2.5, 0, Math.PI*2);
-    ctx.fillStyle = color; ctx.fill();
-  };
-  [386,374,373,380,385,387,362,263,388,390,382,381,384].forEach(i => dot(landmarks[i], 'rgba(200,0,255,0.8)'));
-  [159,145,144,153,158,160,33,133,161,163,154,155,157].forEach(i => dot(landmarks[i], 'rgba(255,255,255,0.8)'));
-}
-
-// ─── Camera ──────────────────────────────────────────────────────────────────
-async function startCamera() {
-  const stream = await navigator.mediaDevices.getUserMedia({
-    video: { facingMode:'user', width:{ideal:640}, height:{ideal:480}, frameRate:{ideal:30} },
-    audio: false,
-  });
-  videoEl.srcObject = stream;
-  await new Promise(r => { videoEl.onloadedmetadata = r; });
-  await videoEl.play();
-  return stream;
-}
-
-// ─── Timer ───────────────────────────────────────────────────────────────────
-function startTimer() {
-  timeLeft = GAME_DURATION_S;
-  updateTimerUI();
-  timerInterval = setInterval(() => {
-    timeLeft--;
-    updateTimerUI();
-    if (timeLeft <= 0) { clearInterval(timerInterval); endGame(); }
-  }, 1000);
-}
-
-function updateTimerUI() {
-  timerText.textContent    = timeLeft;
-  const pct                = (timeLeft / GAME_DURATION_S) * 100;
-  timerBarFill.style.width = `${pct}%`;
-  if (pct > 60)      timerBarFill.style.background = 'linear-gradient(90deg,#ff5252,#ff7043,#c800ff)';
-  else if (pct > 25) timerBarFill.style.background = 'linear-gradient(90deg,#ff8800,#ff7043)';
-  else               timerBarFill.style.background = 'linear-gradient(90deg,#ff2244,#ff6600)';
-  if (timeLeft <= 10) {
-    timerText.style.color      = '#ff4444';
-    timerText.style.textShadow = '0 0 20px rgba(255,68,68,0.9)';
-    timerText.style.animation  = 'glowPulse 0.5s ease-in-out infinite';
-  }
-}
-
-// ─── Buzzer ──────────────────────────────────────────────────────────────────
-function playBuzzer() {
-  try {
-    const ac = new (window.AudioContext || window.webkitAudioContext)();
-    const gn = ac.createGain(); gn.connect(ac.destination);
-    [[880,0,0.18],[660,0.2,0.18],[440,0.4,0.35]].forEach(([freq,start,dur]) => {
-      const osc = ac.createOscillator(); osc.type='square'; osc.frequency.value=freq;
-      const g   = ac.createGain();
-      g.gain.setValueAtTime(0.35, ac.currentTime+start);
-      g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+start+dur);
-      osc.connect(g); g.connect(gn);
-      osc.start(ac.currentTime+start); osc.stop(ac.currentTime+start+dur+0.05);
-    });
-  } catch(_) {}
-  buzzerOverlay.classList.remove('flash');
-  void buzzerOverlay.offsetWidth;
-  buzzerOverlay.classList.add('flash');
-}
-
-// ─── Confetti ────────────────────────────────────────────────────────────────
-let confettiInterval = null;
-const CONFETTI_COLORS = ['#ff5252','#ff7043','#c800ff','#ff44aa','#44ffcc','#500073','#ffffff'];
-
-function createConfettiBurst() {
-  for (let i = 0; i < 60; i++) {
-    const el = document.createElement('div');
-    el.className = 'confetti-piece';
-    const color = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
-    const dur   = 2.5 + Math.random() * 2;
-    const delay = Math.random() * 1.5;
-    el.style.cssText = `left:${Math.random()*100}vw;top:-20px;
-      width:${6+Math.random()*10}px;height:${8+Math.random()*12}px;
-      background:${color};transform:rotate(${Math.random()*360}deg);
-      --duration:${dur}s;--delay:${delay}s;
-      animation-delay:${delay}s;animation-duration:${dur}s;`;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), (dur + delay + 0.5) * 1000);
-  }
-}
-
-function launchConfetti() {
-  document.querySelectorAll('.confetti-piece').forEach(el => el.remove());
-  createConfettiBurst(); // Initial burst
-  if (confettiInterval) clearInterval(confettiInterval);
-  confettiInterval = setInterval(createConfettiBurst, 1500);
-}
-
-function stopConfetti() {
-  if (confettiInterval) clearInterval(confettiInterval);
-  document.querySelectorAll('.confetti-piece').forEach(el => el.remove());
-}
-
-// ─── Utility ─────────────────────────────────────────────────────────────────
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-// ─── Screen transitions ──────────────────────────────────────────────────────
-function showScreen(id) {
-  [screenWelcome, screenGame, screenReward].forEach(s => s.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
-}
-
-// ─── 3-2-1 countdown ─────────────────────────────────────────────────────────
-async function countdown321() {
-  for (const msg of ['3…','2…','1…','GO! 🟡']) {
-    trackingStatus.textContent = msg;
-    await sleep(700);
-  }
-}
-
-// ─── Flow: Start challenge ───────────────────────────────────────────────────
-async function startChallenge() {
-  const btn = document.getElementById('btn-start');
-  btn.disabled = true; btn.textContent = '⏳ Starting…';
-  welcomeError.classList.add('hidden');
-
-  try {
-    showScreen('screen-game');
-    trackingStatus.textContent = '🧠 Loading face-tracking model…';
-
-    // NOTE: The MediaPipe Camera utility manages getUserMedia internally.
-    // Do NOT call startCamera() here - that would open a second competing stream.
-    initFaceMesh();
-
-    camera = new Camera(videoEl, {
-      onFrame: async () => {
-        if (faceMesh && videoEl.readyState >= 2) await faceMesh.send({ image: videoEl });
-      },
-      width: 640, height: 480,
-    });
-    await camera.start();
-
-    await sleep(1500);   // warm-up: let FaceMesh initialise and first frames arrive
-    window._calibFaceReady = false;
-    trackingStatus.textContent = '🎯 Starting calibration…';
-
-    await startCalibration();
-
-  } catch (err) {
-    showScreen('screen-welcome');
-    btn.disabled = false; btn.textContent = '🚀 Start Challenge';
-    welcomeError.textContent = `❌ ${err.message || 'Camera access required.'}`;
-    welcomeError.classList.remove('hidden');
-    console.error(err);
-  }
-}
-
-// ─── Begin game (after calibration or skip) ──────────────────────────────────
-async function beginGame() {
-  winkCount = 0;
-  eyeState.left.closed      = false;
-  eyeState.right.closed     = false;
-  eyeState.left.lastWinkTs  = 0;
-  eyeState.right.lastWinkTs = 0;
-  eyeState.left.needsReset  = false;
-  eyeState.right.needsReset = false;
-  earBuffer.left  = [];
-  earBuffer.right = [];
-  pendingWink = null;
-
-  updateWinkUI();
-  trackingStatus.textContent = '✅ Ready!';
-  await countdown321();
-
-  gameActive = true;
-  startTimer();
-  trackingStatus.textContent = '✅ Face detected - keep winking!';
-}
-
-// ─── Flow: End game ───────────────────────────────────────────────────────────
-function endGame() {
-  gameActive = false;
-  playBuzzer();
-
-  const finalWinks    = winkCount;
-  const finalDiscount = Math.min(Math.floor(finalWinks / 3), MAX_DISCOUNT_PCT);
-  promoCode           = `ZEPTOWINK${finalDiscount}`;
-
-  resultWinkCount.textContent  = finalWinks;
-  resultDiscount.textContent   = `${finalDiscount}% OFF`;
-  promoCodeDisplay.textContent = promoCode;
-
-  setTimeout(() => { showScreen('screen-reward'); launchConfetti(); }, 900);
-}
-
-// ─── Flow: Reset ─────────────────────────────────────────────────────────────
-function resetToWelcome() {
-  clearInterval(timerInterval);
-  gameActive  = false;
-  calibActive = false;
-  winkCount   = 0;
-  window._calibFaceReady = false;
-  stopConfetti();
-  pendingWink = null;
-
-  // Stop the Camera utility's internal stream (it manages its own getUserMedia)
-  if (videoEl.srcObject) { videoEl.srcObject.getTracks().forEach(t => t.stop()); videoEl.srcObject = null; }
-  if (camera)            { try { camera.stop(); } catch(_) {} camera = null; }
-  if (faceMesh)          { try { faceMesh.close(); } catch(_) {} faceMesh = null; }
-  cameraStream = null;
-
-  winkCountDisplay.textContent = '0';
-  timerText.textContent        = GAME_DURATION_S;
-  timerBarFill.style.width     = '100%';
-  liveDiscount.textContent     = '0% Off';
-  timerText.style.color        = '#ffffff';
-  timerText.style.textShadow   = '0 0 15px rgba(255,255,255,0.5)';
-  timerText.style.animation    = 'none';
-  recalibrateBtn.style.display = 'none';
-  calibOverlay.classList.add('hidden');
-
-  const btn = document.getElementById('btn-start');
-  btn.disabled = false; btn.textContent = '🚀 Start Challenge';
-  showScreen('screen-welcome');
-}
-
-// ─── Copy promo code ──────────────────────────────────────────────────────────
-async function copyPromoCode() {
-  const code = promoCodeDisplay.textContent || promoCode;
-  try {
-    await navigator.clipboard.writeText(code);
-  } catch(_) {
-    const ta = document.createElement('textarea');
-    ta.value = code; ta.style.cssText = 'position:fixed;opacity:0';
-    document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); ta.remove();
-  }
-  const toast = document.getElementById('copy-toast');
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2200);
-}
-</script>
 </body>
 </html>
