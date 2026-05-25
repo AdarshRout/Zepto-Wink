@@ -151,6 +151,7 @@
       border: 3px solid rgba(255,255,255,0.2);
       box-shadow: 0 0 30px rgba(80,0,115,0.6), 0 0 60px rgba(80,0,115,0.3);
       transition: box-shadow 0.1s ease;
+      container-type: size; /* Enable container query support for child scaling */
     }
     #video-wrapper.wink-flash {
       box-shadow:
@@ -433,6 +434,23 @@
       animation: buzzerFlash 0.8s ease forwards;
     }
 
+    /* ── Fight start flash ── */
+    @keyframes fightFlash {
+      0%   { opacity: 0.85; }
+      100% { opacity: 0; }
+    }
+    #fight-flash-overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #e040fb, #ffffff, #c800ff);
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0;
+    }
+    #fight-flash-overlay.flash {
+      animation: fightFlash 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+    }
+
     /* ── Mobile responsive tweaks ── */
     @media (max-width: 480px) {
       .digital-counter { font-size: 4.5rem !important; }
@@ -456,7 +474,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 1rem 1.25rem 44px; /* bottom reserved for the tip pill */
+      padding: 0.5rem 1rem 36px; 
       overflow: hidden;
       background: linear-gradient(180deg,
         rgba(15,0,25,0.88) 0%,
@@ -472,35 +490,12 @@
     }
     #calib-overlay.hidden { display: none; }
 
-    /* Step progress dots */
-    .calib-dots {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 1rem;
-    }
-    .calib-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.2);
-      border: 1px solid rgba(255,255,255,0.3);
-      transition: all 0.3s ease;
-    }
-    .calib-dot.active {
-      background: #ffffff;
-      box-shadow: 0 0 10px rgba(255,255,255,0.8);
-      transform: scale(1.25);
-    }
-    .calib-dot.done {
-      background: #44ff88;
-      border-color: #44ff88;
-      box-shadow: 0 0 8px rgba(68,255,136,0.6);
-    }
+
 
     /* Big icon */
     #calib-icon {
-      font-size: 3rem;
-      margin-bottom: 0.3rem;
+      font-size: 2.2rem;
+      margin-bottom: 2px;
       filter: drop-shadow(0 0 16px rgba(255,255,255,0.6));
       animation: floatIcon 2.5s ease-in-out infinite;
     }
@@ -513,30 +508,32 @@
     #calib-title {
       font-family: 'Orbitron', monospace;
       font-weight: 900;
-      font-size: 1.05rem;
+      font-size: 0.9rem;
       color: #ffffff;
       text-align: center;
       letter-spacing: 1px;
       text-shadow: 0 0 20px rgba(255,255,255,0.5);
-      margin-bottom: 0.25rem;
+      margin-bottom: 2px;
     }
     #calib-subtitle {
-      font-size: 0.8rem;
+      font-size: 0.72rem;
       color: rgba(255,255,255,0.65);
       text-align: center;
       max-width: 260px;
-      line-height: 1.5;
-      margin-bottom: 1rem;
+      line-height: 1.3;
+      margin-bottom: 6px;
     }
 
     /* SVG countdown ring */
     .calib-ring-wrap {
       position: relative;
-      width: 80px;
-      height: 80px;
-      margin-bottom: 1rem;
+      width: 64px;
+      height: 64px;
+      margin-bottom: 6px;
     }
     .calib-ring-wrap svg {
+      width: 100%;
+      height: 100%;
       transform: rotate(-90deg);
     }
     .calib-ring-bg {
@@ -573,13 +570,13 @@
     }
     #calib-ring-sec {
       font-family: 'Orbitron', monospace;
-      font-size: 1.3rem;
+      font-size: 1.05rem;
       font-weight: 900;
       color: #ffffff;
       line-height: 1;
     }
     #calib-ring-unit {
-      font-size: 0.55rem;
+      font-size: 0.45rem;
       color: rgba(255,255,255,0.6);
       letter-spacing: 1px;
     }
@@ -588,7 +585,7 @@
     .calib-ear-row {
       display: flex;
       gap: 8px;
-      margin-bottom: 0.85rem;
+      margin-bottom: 5px;
     }
     .calib-ear-pill {
       display: flex;
@@ -597,16 +594,16 @@
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.15);
       border-radius: 999px;
-      padding: 4px 12px;
+      padding: 3px 10px;
       font-family: 'Orbitron', monospace;
-      font-size: 0.72rem;
+      font-size: 0.65rem;
       color: rgba(255,255,255,0.8);
       transition: border-color 0.2s, background 0.2s;
     }
     .calib-ear-pill .pill-label {
       font-weight: 700;
       color: rgba(255,255,255,0.5);
-      font-size: 0.65rem;
+      font-size: 0.58rem;
     }
     .calib-ear-pill.ear-closed {
       border-color: rgba(255,68,68,0.6);
@@ -621,15 +618,15 @@
 
     /* Status badge */
     #calib-status {
-      font-size: 0.75rem;
+      font-size: 0.65rem;
       font-weight: 700;
       letter-spacing: 0.8px;
-      padding: 4px 14px;
+      padding: 3px 10px;
       border-radius: 999px;
       background: rgba(255,255,255,0.1);
       border: 1px solid rgba(255,255,255,0.25);
       color: rgba(255,255,255,0.75);
-      margin-bottom: 0.85rem;
+      margin-bottom: 6px;
       transition: all 0.3s ease;
     }
     #calib-status.success {
@@ -643,18 +640,7 @@
       color: #e080ff;
     }
 
-    /* Skip link */
-    #calib-skip {
-      font-size: 0.7rem;
-      color: rgba(255,255,255,0.3);
-      cursor: pointer;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-      transition: color 0.2s;
-      background: none;
-      border: none;
-    }
-    #calib-skip:hover { color: rgba(255,255,255,0.6); }
+
 
     /* Instruction highlight */
     .calib-highlight {
@@ -679,7 +665,7 @@
     /* ── Calibration bonus tip ── */
     #calib-tip {
       position: absolute;
-      bottom: 10px;
+      bottom: 6px;
       left: 50%;
       transform: translateX(-50%);
       white-space: nowrap;
@@ -689,7 +675,7 @@
       background: rgba(255, 200, 0, 0.10);
       border: 1px solid rgba(255, 200, 0, 0.35);
       border-radius: 999px;
-      padding: 4px 12px;
+      padding: 3px 10px;
       font-size: 0.62rem;
       font-weight: 700;
       color: rgba(255, 220, 80, 0.95);
@@ -700,6 +686,57 @@
     @keyframes tipPulse {
       0%,100% { opacity: 0.75; box-shadow: 0 0 8px  rgba(255,200,0,0.10); }
       50%      { opacity: 1;    box-shadow: 0 0 16px rgba(255,200,0,0.28); }
+    }
+
+    /* ── Responsive calibration styles for small video heights ── */
+    @container (max-height: 300px) {
+      #calib-overlay {
+        padding: 0.3rem 0.75rem 28px;
+      }
+
+      #calib-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0;
+      }
+      #calib-title {
+        font-size: 0.8rem;
+        margin-bottom: 0px;
+      }
+      #calib-subtitle {
+        font-size: 0.65rem;
+        margin-bottom: 3px;
+        line-height: 1.1;
+      }
+      .calib-ring-wrap {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 3px;
+      }
+      #calib-ring-sec {
+        font-size: 0.9rem;
+      }
+      .calib-ear-row {
+        margin-bottom: 3px;
+        gap: 4px;
+      }
+      .calib-ear-pill {
+        padding: 2px 8px;
+        font-size: 0.58rem;
+      }
+      .calib-ear-pill .pill-label {
+        font-size: 0.5rem;
+      }
+      #calib-status {
+        font-size: 0.58rem;
+        padding: 2px 8px;
+        margin-bottom: 3px;
+      }
+
+      #calib-tip {
+        bottom: 4px;
+        font-size: 0.55rem;
+        padding: 2px 8px;
+      }
     }
 
     /* ── Wink eye animation (welcome screen) ── */
@@ -764,6 +801,17 @@
       border-radius: 0 0 50% 50%;
       background: #1a0028;
     }
+
+    /* ── Pre-game countdown pop animation ── */
+    @keyframes preGamePop {
+      0%   { transform: scale(0.3); opacity: 0; filter: blur(4px); }
+      50%  { transform: scale(1.35); opacity: 1; filter: blur(0px); }
+      75%  { transform: scale(0.92); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .countdown-pop {
+      animation: preGamePop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
   </style>
 </head>
 
@@ -774,6 +822,9 @@
 
 <!-- Buzzer flash overlay -->
 <div id="buzzer-overlay"></div>
+
+<!-- Fight flash overlay -->
+<div id="fight-flash-overlay"></div>
 
 <!-- Copy toast -->
 <div id="copy-toast">✅ Code copied to clipboard!</div>
@@ -901,15 +952,30 @@
         <p class="font-bold text-sm mt-1 text-white">Please keep both eyes clearly visible in the frame</p>
       </div>
 
+      <!-- ── Pre-game Countdown Overlay ── -->
+      <div id="countdown-overlay" class="hidden absolute inset-0 z-40 flex flex-col items-center justify-center backdrop-blur-sm rounded-[20px]" style="background: rgba(15,0,25,0.68);">
+        <div class="countdown-circle-wrap relative w-24 h-24 flex items-center justify-center">
+          <!-- Premium glowing loader ring -->
+          <svg class="absolute inset-0 animate-spin" width="96" height="96" viewBox="0 0 96 96" style="animation-duration: 2s;">
+            <circle cx="48" cy="48" r="42" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="4"/>
+            <circle cx="48" cy="48" r="42" fill="none" stroke="url(#countdown-grad)" stroke-width="4" stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="180"/>
+            <defs>
+              <linearGradient id="countdown-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ff5252"/>
+                <stop offset="100%" stop-color="#c800ff"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <!-- Giant glowing countdown text -->
+          <div id="countdown-number" class="font-display font-black text-2xl text-white countdown-pop" style="text-shadow: 0 0 20px rgba(200,0,255,0.8);">READY</div>
+        </div>
+        <div id="countdown-label" class="mt-4 font-display font-bold text-xs uppercase tracking-widest text-white/70">WINK CHALLENGE STARTING</div>
+      </div>
+
       <!-- ── Calibration Overlay (lives INSIDE video-wrapper so it sits over the feed) ── -->
       <div id="calib-overlay" class="hidden">
 
-        <!-- Step progress dots -->
-        <div class="calib-dots">
-          <div class="calib-dot" id="cdot-0"></div>
-          <div class="calib-dot" id="cdot-1"></div>
-          <div class="calib-dot" id="cdot-2"></div>
-        </div>
+
 
         <!-- Icon -->
         <div id="calib-icon">👁️</div>
@@ -947,8 +1013,7 @@
         <!-- Status -->
         <div id="calib-status">⏳ Waiting for face…</div>
 
-        <!-- Skip -->
-        <button id="calib-skip" onclick="skipCalibration()">Skip calibration</button>
+
 
         <!-- Bonus tip -->
         <div id="calib-tip">📸 Move Closer to the Cam for better accuracy</div>

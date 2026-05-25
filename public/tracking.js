@@ -383,6 +383,43 @@ function _playBuzzer() {
   if (bo) { bo.classList.remove('flash'); void bo.offsetWidth; bo.classList.add('flash'); }
 }
 
+// ─── Wrestling bell sound ────────────────────────────────────────────────────
+function _playWrestlingBell() {
+  try {
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const gn = ac.createGain();
+    gn.connect(ac.destination);
+
+    // 3 clean, metallic clangs at 0.0s, 0.28s, and 0.56s
+    [0.0, 0.28, 0.56].forEach(start => {
+      // Use 3 detuned frequencies to simulate a rich metallic bell resonance
+      [880, 883, 1200].forEach((freq, idx) => {
+        const osc = ac.createOscillator();
+        const oscGain = ac.createGain();
+        
+        osc.type = idx === 2 ? 'sine' : 'triangle';
+        osc.frequency.value = freq;
+        
+        // High frequency (1200Hz) has lower volume and faster decay for attack brightness
+        const maxVol = idx === 2 ? 0.08 : 0.22;
+        const decayTime = idx === 2 ? 0.35 : 1.1;
+        
+        oscGain.gain.setValueAtTime(0.0, ac.currentTime + start);
+        oscGain.gain.linearRampToValueAtTime(maxVol, ac.currentTime + start + 0.008);
+        oscGain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + start + decayTime);
+        
+        osc.connect(oscGain);
+        oscGain.connect(gn);
+        
+        osc.start(ac.currentTime + start);
+        osc.stop(ac.currentTime + start + decayTime + 0.05);
+      });
+    });
+  } catch (_) {}
+  const fo = _dom('fight-flash-overlay');
+  if (fo) { fo.classList.remove('flash'); void fo.offsetWidth; fo.classList.add('flash'); }
+}
+
 // ─── Confetti ─────────────────────────────────────────────────────────────────
 let _confettiInterval = null;
 const _CONFETTI_COLORS = ['#ff5252','#ff7043','#c800ff','#ff44aa','#44ffcc','#500073','#ffffff'];
@@ -427,10 +464,54 @@ function _showScreen(id) {
 }
 
 async function _countdown321() {
-  const el = _dom('tracking-status');
-  for (const msg of ['3…', '2…', '1…', 'GO! 🟡']) {
-    if (el) el.textContent = msg;
-    await _sleep(700);
+  const elStatus = _dom('tracking-status');
+  const overlay  = _dom('countdown-overlay');
+  const numEl    = _dom('countdown-number');
+  const labelEl  = _dom('countdown-label');
+  
+  if (overlay) overlay.classList.remove('hidden');
+
+  const steps = [
+    { text: 'READY', label: 'GET SET' },
+    { text: '3', label: 'PREPARE YOUR EYES' },
+    { text: '2', label: 'PREPARE YOUR EYES' },
+    { text: '1', label: 'PREPARE YOUR EYES' },
+    { text: 'GO! 🟡', label: 'WINK AS FAST AS YOU CAN!' }
+  ];
+
+  for (const step of steps) {
+    if (elStatus) elStatus.textContent = step.text === 'READY' ? '✅ Ready!' : step.text;
+    
+    if (numEl) {
+      numEl.textContent = step.text;
+      numEl.classList.remove('countdown-pop');
+      void numEl.offsetWidth; // Force DOM reflow to restart animation
+      numEl.classList.add('countdown-pop');
+      
+      // Color-code GO! to glowing yellow, others to white-magenta
+      if (step.text.includes('GO')) {
+        numEl.style.color = '#ffff00';
+        numEl.style.textShadow = '0 0 20px rgba(255,255,0,0.8), 0 0 40px rgba(255,160,0,0.6)';
+      } else {
+        numEl.style.color = '#ffffff';
+        numEl.style.textShadow = '0 0 20px rgba(200,0,255,0.8), 0 0 40px rgba(255,82,82,0.6)';
+      }
+    }
+    
+    if (labelEl) labelEl.textContent = step.label;
+    
+    await _sleep(800);
+  }
+
+  // Smoothly fade out countdown overlay
+  if (overlay) {
+    overlay.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    overlay.style.opacity = '0';
+    overlay.style.transform = 'scale(1.1)';
+    await _sleep(300);
+    overlay.classList.add('hidden');
+    overlay.style.opacity = '';
+    overlay.style.transform = '';
   }
 }
 
@@ -467,6 +548,7 @@ async function beginGame() {
 
   await _countdown321();
 
+  _playWrestlingBell(); // Play the wrestling ring fight-start bell!
   _gameActive = true;
   _startTimer();
 
