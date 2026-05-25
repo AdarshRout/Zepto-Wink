@@ -1095,6 +1095,9 @@ let camera        = null;
 let promoCode     = '';
 let cameraStream  = null;
 
+let pendingWink   = null;
+const CONFIRM_DELAY_MS = 150; // buffer window to verify a single eye wink and filter out blinks
+
 const eyeState = {
   left:  { closed: false, lastWinkTs: 0, needsReset: false, tainted: false },
   right: { closed: false, lastWinkTs: 0, needsReset: false, tainted: false },
@@ -1330,6 +1333,7 @@ async function restartCalibration() {
     window._calibFaceReady = false;
     recalibrateBtn.style.display = 'none';
     winkCount = 0;
+    pendingWink = null;
     updateWinkUI();
     await startCalibration();
   } catch (err) {
@@ -1365,19 +1369,41 @@ function processEARs(lEAR, rEAR) {
   const leftClosed  = lEAR < T.left.closed;
   const rightClosed = rEAR < T.right.closed;
 
+  // ── Pending wink confirmation ──────────────────────────────────────────────
+  // After an eye reopens from a wink, we wait CONFIRM_DELAY_MS to verify the
+  // other eye does not also close (which indicates a bilateral blink/wink).
+  if (pendingWink) {
+    const otherClosed = pendingWink.side === 'LEFT' ? (rEAR < T.right.closed) : (lEAR < T.left.closed);
+    if (otherClosed) {
+      // Other eye closed during the confirmation window -> bilateral blink!
+      const cancelledSide = pendingWink.side.toLowerCase();
+      pendingWink = null;
+      eyeState.left.tainted = true;
+      eyeState.right.tainted = true;
+      eyeState[cancelledSide].needsReset = true;
+      triggerDoubleBlink();
+      return;
+    }
+    if (now - pendingWink.ts > CONFIRM_DELAY_MS) {
+      // Confirmed genuine single-eye wink!
+      registerWink(pendingWink.side);
+      const side = pendingWink.side.toLowerCase();
+      eyeState[side].lastWinkTs = now;
+      eyeState[side].needsReset = true;
+      pendingWink = null;
+    }
+  }
+
   // ── Double-blink / simultaneous wink guard ─────────────────────────────────
-  // If both eyes are simultaneously below their closed threshold this is a
-  // bilateral blink (or a simultaneous double-wink). Mark both gestures as
-  // tainted so they cannot score when their eye reopens.
+  // If both eyes are simultaneously below their closed threshold, taint both.
   if (leftClosed && rightClosed) {
-    // Taint BOTH sides unconditionally to prevent registration when they reopen
+    pendingWink = null;
     eyeState.left.tainted  = true;
     eyeState.right.tainted = true;
-    // Also set closed flags so the reopen path runs correctly
     eyeState.left.closed  = true;
     eyeState.right.closed = true;
     triggerDoubleBlink();
-    return;  // nothing to score this frame
+    return;
   }
 
   // ── EAR delta ─────────────────────────────────────────────────────────────
@@ -1396,24 +1422,19 @@ function processEARs(lEAR, rEAR) {
   // ── Left wink ─────────────────────────────────────────────────────────────
   // Trigger:  raw left EAR below closed threshold
   // Validity: smoothed right EAR above 75 % of its open baseline (otherMin)
-  //           — relaxed from 95 % so quick winks aren't accidentally blocked.
   const rightOpen = sr > T.right.otherMin;
 
   if (leftClosed && rightOpen) {
     // Start or continue the left-wink gesture
     eyeState.left.closed = true;
-    // If right eye also dropped below its threshold at some earlier frame
-    // the bilateral check above would have set tainted already; nothing extra needed.
   } else if (!leftClosed && eyeState.left.closed) {
-    // Left eye just reopened — attempt to score
+    // Left eye just reopened — queue for confirmation instead of scoring immediately
     const canScore =
       !eyeState.left.tainted &&
       !eyeState.left.needsReset &&
       (now - eyeState.left.lastWinkTs > WINK_DEBOUNCE_MS);
-    if (canScore) {
-      registerWink('LEFT');
-      eyeState.left.lastWinkTs = now;
-      eyeState.left.needsReset = true;  // prevent immediate re-trigger
+    if (canScore && !pendingWink) {
+      pendingWink = { side: 'LEFT', ts: now };
     }
     eyeState.left.closed  = false;
     eyeState.left.tainted = false;
@@ -1430,14 +1451,13 @@ function processEARs(lEAR, rEAR) {
   if (rightClosed && leftOpen) {
     eyeState.right.closed = true;
   } else if (!rightClosed && eyeState.right.closed) {
+    // Right eye just reopened — queue for confirmation
     const canScore =
       !eyeState.right.tainted &&
       !eyeState.right.needsReset &&
       (now - eyeState.right.lastWinkTs > WINK_DEBOUNCE_MS);
-    if (canScore) {
-      registerWink('RIGHT');
-      eyeState.right.lastWinkTs = now;
-      eyeState.right.needsReset = true;
+    if (canScore && !pendingWink) {
+      pendingWink = { side: 'RIGHT', ts: now };
     }
     eyeState.right.closed  = false;
     eyeState.right.tainted = false;
@@ -1738,6 +1758,7 @@ async function beginGame() {
   eyeState.right.needsReset = false;
   earBuffer.left  = [];
   earBuffer.right = [];
+  pendingWink = null;
 
   updateWinkUI();
   trackingStatus.textContent = '✅ Ready!';
@@ -1772,6 +1793,7 @@ function resetToWelcome() {
   winkCount   = 0;
   window._calibFaceReady = false;
   stopConfetti();
+  pendingWink = null;
 
   // Stop the Camera utility's internal stream (it manages its own getUserMedia)
   if (videoEl.srcObject) { videoEl.srcObject.getTracks().forEach(t => t.stop()); videoEl.srcObject = null; }
