@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" fill="none">
+  <!-- Outer rounded square border -->
+  <rect x="55" y="55" width="690" height="690" rx="90" ry="90"
+        stroke="#ff00ff" stroke-width="70" fill="white"/>
+  <!-- Z letterform with rounded caps -->
+  <path d="M 265 255 L 535 255 L 265 545 L 535 545"
+        stroke="#ff00ff" stroke-width="70"
+        stroke-linecap="round" stroke-linejoin="round"
+        fill="none"/>
+</svg>
