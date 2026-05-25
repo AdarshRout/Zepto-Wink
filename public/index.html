@@ -677,25 +677,28 @@
 
     /* ── Calibration bonus tip ── */
     #calib-tip {
-      margin-top: 0.7rem;
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       background: rgba(255, 200, 0, 0.10);
       border: 1px solid rgba(255, 200, 0, 0.35);
       border-radius: 999px;
-      padding: 5px 14px;
-      font-size: 0.68rem;
+      padding: 4px 12px;
+      font-size: 0.62rem;
       font-weight: 700;
       color: rgba(255, 220, 80, 0.95);
-      letter-spacing: 0.4px;
-      text-align: center;
+      letter-spacing: 0.3px;
       animation: tipPulse 2s ease-in-out infinite;
-      box-shadow: 0 0 12px rgba(255,200,0,0.15);
+      box-shadow: 0 0 10px rgba(255,200,0,0.12);
     }
     @keyframes tipPulse {
-      0%,100% { opacity: 0.75; transform: scale(1);    box-shadow: 0 0 8px  rgba(255,200,0,0.12); }
-      50%      { opacity: 1;    transform: scale(1.03); box-shadow: 0 0 18px rgba(255,200,0,0.30); }
+      0%,100% { opacity: 0.75; box-shadow: 0 0 8px  rgba(255,200,0,0.10); }
+      50%      { opacity: 1;    box-shadow: 0 0 16px rgba(255,200,0,0.28); }
     }
 
     /* ── Wink eye animation (welcome screen) ── */
