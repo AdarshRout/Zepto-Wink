@@ -13,7 +13,7 @@ const RING_CIRC = 2 * Math.PI * 35; // ≈ 219.9
 const CALIB_STEP_META = [
   {
     dotIdx: 0, icon: '👀', title: 'EYE CALIBRATION',
-    subtitle: 'MOVE <span class="calib-highlight">closer to the CAMERA</span> with <span class="calib-highlight">BOTH eyes NATURALLYopen</span>  for better calibration',
+    subtitle: 'MOVE <span class="calib-highlight">closer to the CAMERA</span> with <span class="calib-highlight">BOTH eyes NATURALLY open</span>  for better calibration',
     durationMs: 3500,
   },
 ];
