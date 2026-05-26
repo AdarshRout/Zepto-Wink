@@ -36,9 +36,15 @@ const WINK_DEBOUNCE_MS = 260;   // min ms between registered winks on same side
 const LEFT_EYE_IDX  = { p1: 263, p2: 387, p3: 386, p4: 362, p5: 373, p6: 380 };
 const RIGHT_EYE_IDX = { p1: 33,  p2: 160, p3: 159, p4: 133, p5: 144, p6: 153 };
 
-// Wink scoring thresholds
-const WINK_SCORE_ACTIVE   = 0.40;  // active eye score must be BELOW this
-const WINK_SCORE_OPPOSITE = 0.50;  // opposite eye score must be ABOVE this
+// Wink scoring thresholds (calibration-based lerpScore path)
+const WINK_SCORE_ACTIVE   = 0.45;  // active eye score must be BELOW this
+const WINK_SCORE_OPPOSITE = 0.35;  // opposite eye score must be ABOVE this
+
+// Raw EAR asymmetry path (catches narrow-eyed users where lerpScore fails)
+// A wink is also detected when one eye's RAW EAR is significantly lower than
+// the other AND both are below their calibrated max (not just natural variation).
+const WINK_RAW_RATIO      = 0.80;  // active/opposite ratio must be BELOW this (e.g., 0.25/0.35 = 0.71)
+const WINK_RAW_MIN_DIFF   = 0.04;  // absolute EAR difference must be at least this
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let _winkCount    = 0;
@@ -192,7 +198,13 @@ function _triggerDoubleBlink() {
   _blinkWarningTimer = setTimeout(() => el.classList.remove('show'), 900);
 }
 
-// ─── Core wink detection (relaxed Lerp engine) ────────────────────────────────
+// ─── Core wink detection (dual-path engine) ──────────────────────────────────
+//
+// PATH 1 – Calibration lerpScore (works well when open EAR is high ~0.35+)
+// PATH 2 – Raw EAR asymmetry    (works for naturally narrow eyes with low EAR)
+//
+// Either path can trigger a wink. This makes detection robust across all
+// face types, eye shapes, and lighting conditions.
 function _processEARs(lEAR, rEAR) {
   if (!_gameActive || window._recalibratingActive) return;
 
@@ -204,21 +216,33 @@ function _processEARs(lEAR, rEAR) {
 
   const now = Date.now();
 
+  // ── PATH 2: Raw asymmetry helpers ───────────────────────────────────────
+  // Detects wink via raw EAR ratio regardless of calibrated range.
+  // One eye significantly lower than the other = wink.
+  const diff = Math.abs(lEAR - rEAR);
+  const rawLeftWink  = rEAR > 0 && (lEAR / rEAR) < WINK_RAW_RATIO && diff >= WINK_RAW_MIN_DIFF && lEAR < rEAR;
+  const rawRightWink = lEAR > 0 && (rEAR / lEAR) < WINK_RAW_RATIO && diff >= WINK_RAW_MIN_DIFF && rEAR < lEAR;
+
   // ── Bilateral blink guard ────────────────────────────────────────────────
-  // If both eyes are near-closed simultaneously → double blink, no wink credit
-  if (leftScore < WINK_SCORE_ACTIVE && rightScore < WINK_SCORE_ACTIVE) {
+  // Use RAW EAR values (not lerpScore) so narrow-eyed users aren't false-fired.
+  // A double blink = both raw EARs are low AND similar to each other.
+  const bothLow = lEAR < (p.leftMax  * 0.75) && rEAR < (p.rightMax * 0.75);
+  const symmetric = diff < WINK_RAW_MIN_DIFF;
+  if (bothLow && symmetric) {
     _eyeState.left.wasWinking  = false;
     _eyeState.right.wasWinking = false;
     _triggerDoubleBlink();
     return;
   }
 
-  // ── Left eye wink ────────────────────────────────────────────────────────
-  const leftIsWinking = leftScore < WINK_SCORE_ACTIVE && rightScore > WINK_SCORE_OPPOSITE;
+  // ── Left eye wink (PATH 1 OR PATH 2) ────────────────────────────────────
+  const leftIsWinking =
+    (leftScore < WINK_SCORE_ACTIVE && rightScore > WINK_SCORE_OPPOSITE) || // calibration path
+    rawLeftWink;                                                             // asymmetry path
+
   if (leftIsWinking) {
     _eyeState.left.wasWinking = true;
   } else if (_eyeState.left.wasWinking) {
-    // Rising edge: eye just re-opened
     _eyeState.left.wasWinking = false;
     if (now - _eyeState.left.lastWinkTs > WINK_DEBOUNCE_MS) {
       _eyeState.left.lastWinkTs = now;
@@ -228,12 +252,14 @@ function _processEARs(lEAR, rEAR) {
     }
   }
 
-  // ── Right eye wink ───────────────────────────────────────────────────────
-  const rightIsWinking = rightScore < WINK_SCORE_ACTIVE && leftScore > WINK_SCORE_OPPOSITE;
+  // ── Right eye wink (PATH 1 OR PATH 2) ───────────────────────────────────
+  const rightIsWinking =
+    (rightScore < WINK_SCORE_ACTIVE && leftScore > WINK_SCORE_OPPOSITE) || // calibration path
+    rawRightWink;                                                            // asymmetry path
+
   if (rightIsWinking) {
     _eyeState.right.wasWinking = true;
   } else if (_eyeState.right.wasWinking) {
-    // Rising edge: eye just re-opened
     _eyeState.right.wasWinking = false;
     if (now - _eyeState.right.lastWinkTs > WINK_DEBOUNCE_MS) {
       _eyeState.right.lastWinkTs = now;

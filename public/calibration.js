@@ -132,12 +132,18 @@ function _finishCalibration() {
   const lOpen = avg(_calibInternal.leftSamples);
   const rOpen = avg(_calibInternal.rightSamples);
 
-  // Store as lerp endpoints: min = near-closed (~65 % of open), max = open value
+  // Use a fixed absolute drop below the open baseline for the "closed" floor.
+  // Old formula (lOpen * 0.60) collapses to near 0 for narrow-eyed users (e.g.
+  // 0.30 * 0.60 = 0.18) leaving almost no detection window.
+  // New formula: open - 0.13 gives a reliable ~40 % of open-eye EAR as floor.
+  const CLOSE_DROP = 0.13;
   window.userProfile = {
-    leftMin:    lOpen * 0.60,   // EAR at roughly closed state for left eye
-    leftMax:    lOpen,          // EAR at natural open state for left eye
-    rightMin:   rOpen * 0.60,
+    leftMin:    Math.max(lOpen - CLOSE_DROP, 0.08),  // floor at 0.08
+    leftMax:    lOpen,
+    rightMin:   Math.max(rOpen - CLOSE_DROP, 0.08),
     rightMax:   rOpen,
+    leftOpen:   lOpen,   // raw reference kept for asymmetry guard
+    rightOpen:  rOpen,
     calibrated: true,
   };
 
