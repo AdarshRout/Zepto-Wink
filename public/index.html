@@ -86,11 +86,21 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    html {
+      /* Prevent iOS bounce / overscroll */
+      overscroll-behavior: none;
+    }
+
     body {
       background: #1a0028;
       font-family: 'Inter', sans-serif;
       overflow-x: hidden;
       min-height: 100dvh;
+      /* Better touch handling on mobile */
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      /* Safe area insets for notched phones */
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
 
     /* ── Animated background ── */
@@ -125,9 +135,17 @@
       justify-content: center;
       padding: 1.5rem;
       transition: opacity 0.4s ease, transform 0.4s ease;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
     .screen.hidden {
       display: none;
+    }
+
+    /* Game screen needs special treatment on mobile – don't center, flow top-down */
+    #screen-game {
+      justify-content: flex-start;
+      padding-top: 0.75rem;
     }
 
     /* ── Gloss card ── */
@@ -452,9 +470,152 @@
     }
 
     /* ── Mobile responsive tweaks ── */
+
+    /* Tablets and small laptops */
+    @media (max-width: 768px) {
+      .screen {
+        padding: 1rem;
+      }
+      #screen-game {
+        padding: 0.5rem;
+        padding-top: 0.5rem;
+      }
+    }
+
+    /* Mobile phones */
+    @media (max-width: 640px) {
+      .screen {
+        padding: 0.75rem;
+      }
+      #screen-game {
+        padding: 0.5rem;
+        padding-top: 0.35rem;
+      }
+      .gloss-card {
+        border-radius: 18px;
+      }
+      .cta-btn {
+        padding: 14px 24px;
+        font-size: 0.95rem;
+        border-radius: 14px;
+      }
+      .coupon-card {
+        border-radius: 16px;
+      }
+    }
+
+    /* Smaller phones */
     @media (max-width: 480px) {
       .digital-counter { font-size: 4.5rem !important; }
       .promo-code { font-size: 1rem; letter-spacing: 2px; padding: 12px 18px; }
+
+      .cta-btn {
+        padding: 12px 20px;
+        font-size: 0.88rem;
+      }
+
+      #video-wrapper {
+        border-width: 2px;
+        border-radius: 14px;
+      }
+
+      /* Wink count card */
+      .digital-counter {
+        font-size: 3.5rem !important;
+      }
+
+      /* EAR bars area */
+      .ear-bar-wrap {
+        font-size: 0.6rem;
+        gap: 4px;
+      }
+
+      /* Discount badge */
+      .discount-badge {
+        padding: 4px 12px;
+        min-width: 100px !important;
+      }
+      .discount-badge .font-display {
+        font-size: 1rem !important;
+      }
+
+      /* Welcome screen rules card */
+      #screen-welcome .gloss-card {
+        padding: 1.25rem !important;
+      }
+      #screen-welcome h1 {
+        font-size: 1.5rem !important;
+      }
+      #screen-welcome .text-xl {
+        font-size: 1rem !important;
+      }
+
+      /* Reward screen */
+      #screen-reward .gloss-card {
+        padding: 1.25rem !important;
+      }
+      #result-discount {
+        font-size: 2.5rem !important;
+      }
+      #result-wink-count {
+        font-size: 3rem !important;
+      }
+    }
+
+    /* Very small phones (iPhone SE, Galaxy S mini, etc.) */
+    @media (max-width: 380px) {
+      .screen {
+        padding: 0.5rem;
+      }
+      #screen-game {
+        padding: 0.35rem;
+        padding-top: 0.25rem;
+      }
+
+      .digital-counter {
+        font-size: 3rem !important;
+      }
+
+      #screen-welcome h1 {
+        font-size: 1.3rem !important;
+      }
+
+      .cta-btn {
+        padding: 10px 16px;
+        font-size: 0.82rem;
+      }
+
+      .promo-code {
+        font-size: 0.85rem;
+        letter-spacing: 1.5px;
+        padding: 10px 14px;
+      }
+
+      #result-discount {
+        font-size: 2rem !important;
+      }
+    }
+
+    /* ── Short viewport height (landscape or compact phones) ── */
+    @media (max-height: 700px) {
+      #screen-game {
+        justify-content: flex-start;
+        padding-top: 0.25rem;
+      }
+      #video-wrapper {
+        max-height: 220px !important;
+      }
+      .digital-counter {
+        font-size: 3rem !important;
+      }
+    }
+    @media (max-height: 600px) {
+      #video-wrapper {
+        max-height: 180px !important;
+      }
+      .digital-counter {
+        font-size: 2.5rem !important;
+      }
     }
 
     /* ── Scrollbar ── */
@@ -833,11 +994,11 @@
      SCREEN 1 - WELCOME
      ════════════════════════════════════════════════════════ -->
 <div id="screen-welcome" class="screen">
-  <div class="gloss-card w-full max-w-lg p-8 sm:p-10 text-center" style="animation: bounceIn 0.6s ease forwards;">
+  <div class="gloss-card w-full max-w-lg p-5 sm:p-8 md:p-10 text-center" style="animation: bounceIn 0.6s ease forwards;">
 
-    <div class="mb-6 flex flex-col items-center gap-2">
+    <div class="mb-4 sm:mb-6 flex flex-col items-center gap-2">
       <!-- Zepto brand image -->
-      <img src="zepto-logo.png" alt="Zepto" class="h-24 md:h-28 floating-emoji" style="animation-duration:4s; filter: drop-shadow(0px 0px 2px rgba(255,255,255,0.9)) drop-shadow(0px 0px 4px rgba(255,255,255,0.6));">
+      <img src="zepto-logo.png" alt="Zepto" class="h-16 sm:h-24 md:h-28 floating-emoji" style="animation-duration:4s; filter: drop-shadow(0px 0px 2px rgba(255,255,255,0.9)) drop-shadow(0px 0px 4px rgba(255,255,255,0.6));">
       <!-- Alternating wink eyes -->
       <div class="wink-eyes" style="margin-top:6px;">
         <div class="wink-eye left">
@@ -852,16 +1013,16 @@
     </div>
 
     <!-- Headline -->
-    <h1 class="font-display font-black text-3xl sm:text-4xl leading-tight mb-2" style="color:#ffffff; text-shadow: 0 0 30px rgba(255,255,255,0.5);">
+    <h1 class="font-display font-black text-2xl sm:text-3xl md:text-4xl leading-tight mb-2" style="color:#ffffff; text-shadow: 0 0 30px rgba(255,255,255,0.5);">
       Zepto Wink Challenge
     </h1>
-    <p class="text-xl font-bold mb-6" style="color: rgba(255,255,255,0.75); letter-spacing: 1px;">
+    <p class="text-base sm:text-xl font-bold mb-4 sm:mb-6" style="color: rgba(255,255,255,0.75); letter-spacing: 1px;">
       Wink Fast, Save Big! 😉
     </p>
 
     <!-- Rule card -->
-    <div class="rounded-2xl p-5 mb-6 text-left" style="background: rgba(200,0,255,0.08); border: 1px solid rgba(200,0,255,0.3);">
-      <p class="text-white font-semibold text-base mb-3 flex items-center gap-2">
+    <div class="rounded-2xl p-4 sm:p-5 mb-4 sm:mb-6 text-left" style="background: rgba(200,0,255,0.08); border: 1px solid rgba(200,0,255,0.3);">
+      <p class="text-white font-semibold text-sm sm:text-base mb-2 sm:mb-3 flex items-center gap-2">
         <span class="text-xl">📋</span> Here's How It Works:
       </p>
       <ul class="space-y-2">
@@ -912,23 +1073,23 @@
 <!-- ════════════════════════════════════════════════════════
      SCREEN 2 - GAME ARENA
      ════════════════════════════════════════════════════════ -->
-<div id="screen-game" class="screen hidden" style="padding: 1rem;">
-  <div class="w-full max-w-lg flex flex-col gap-4">
+<div id="screen-game" class="screen hidden" style="padding: 0.75rem;">
+  <div class="w-full max-w-lg flex flex-col gap-2 sm:gap-4">
 
     <!-- Top bar: Logo + Timer text -->
     <div class="flex items-center justify-between px-1">
-      <img src="zepto-logo.png" alt="Zepto" class="h-6">
-      <div class="font-display font-bold text-sm" style="color: rgba(255,255,255,0.7); letter-spacing:1px;">WINK CHALLENGE</div>
-      <div id="timer-text" class="font-display font-black text-xl" style="color: #ffffff; text-shadow: 0 0 15px rgba(255,255,255,0.5);">45</div>
+      <img src="zepto-logo.png" alt="Zepto" class="h-5 sm:h-6">
+      <div class="font-display font-bold text-xs sm:text-sm" style="color: rgba(255,255,255,0.7); letter-spacing:1px;">WINK CHALLENGE</div>
+      <div id="timer-text" class="font-display font-black text-lg sm:text-xl" style="color: #ffffff; text-shadow: 0 0 15px rgba(255,255,255,0.5);">45</div>
     </div>
 
     <!-- Timer seek bar -->
-    <div class="w-full h-3 rounded-full" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);">
+    <div class="w-full h-2 sm:h-3 rounded-full" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);">
       <div id="timer-bar-fill" style="width: 100%;"></div>
     </div>
 
     <!-- Video + Canvas -->
-    <div id="video-wrapper" class="relative w-full" style="aspect-ratio: 4/3; max-height: 340px;">
+    <div id="video-wrapper" class="relative w-full" style="aspect-ratio: 4/3; max-height: clamp(200px, 40vh, 340px);">
       <video id="webcam-video" autoplay playsinline muted></video>
       <canvas id="overlay-canvas"></canvas>
 
@@ -1023,15 +1184,15 @@
 
 
     <!-- Live wink count -->
-    <div class="gloss-card p-4 text-center">
+    <div class="gloss-card p-3 sm:p-4 text-center">
       <p class="text-xs font-semibold mb-1 uppercase tracking-widest" style="color: rgba(255,255,255,0.5);">Wink Count</p>
-      <div id="wink-count-display" class="digital-counter text-7xl sm:text-8xl">0</div>
+      <div id="wink-count-display" class="digital-counter text-5xl sm:text-7xl md:text-8xl">0</div>
     </div>
 
     <!-- EAR debug bars + Discount badge row -->
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2 sm:gap-3">
       <!-- EAR indicators -->
-      <div class="flex-1 gloss-card px-3 py-2 space-y-1.5">
+      <div class="flex-1 gloss-card px-2 sm:px-3 py-2 space-y-1.5 min-w-0">
         <div class="ear-bar-wrap">
           <span style="color: rgba(255,255,255,0.6); min-width: 18px;">L</span>
           <div class="ear-bar">
@@ -1049,9 +1210,9 @@
       </div>
 
       <!-- Discount badge -->
-      <div class="discount-badge text-center" style="color: #ffffff; min-width: 130px;">
+      <div class="discount-badge text-center shrink-0" style="color: #ffffff; min-width: 100px;">
         <div class="text-xs opacity-70 uppercase tracking-widest font-semibold">Discount</div>
-        <div id="live-discount" class="font-display font-black text-xl">0% Off</div>
+        <div id="live-discount" class="font-display font-black text-lg sm:text-xl">0% Off</div>
       </div>
     </div>
 
@@ -1072,7 +1233,7 @@
      SCREEN 3 - REWARD / RESULTS
      ════════════════════════════════════════════════════════ -->
 <div id="screen-reward" class="screen hidden">
-  <div class="gloss-card w-full max-w-lg p-8 text-center" style="animation: bounceIn 0.6s ease forwards;">
+  <div class="gloss-card w-full max-w-lg p-5 sm:p-8 text-center" style="animation: bounceIn 0.6s ease forwards;">
 
     <!-- Header -->
     <div class="mb-4">

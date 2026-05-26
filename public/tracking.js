@@ -11,6 +11,10 @@
  */
 'use strict';
 
+// ─── Mobile detection ─────────────────────────────────────────────────────────────────────
+const _isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  || (navigator.maxTouchPoints > 1 && window.innerWidth < 1024);
+
 // ─── getUserMedia Interceptor (Fixes MediaPipe track release bug) ──────────────
 const _activeStreams = [];
 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -287,7 +291,7 @@ function _onFaceMeshResults(results, canvasEl, ctx, videoEl) {
     landmarks[263].x - landmarks[33].x,
     landmarks[263].y - landmarks[33].y
   );
-  if (eyeDist < 0.14) {
+  if (eyeDist < (_isMobile ? 0.10 : 0.14)) {
     window._faceInRange = false;
     if (_gameActive || window.isCalibActive()) {
       if (distWarning) { distWarning.classList.remove('hidden'); distWarning.classList.add('flex'); }
@@ -436,7 +440,8 @@ let _confettiInterval = null;
 const _CONFETTI_COLORS = ['#ff5252','#ff7043','#c800ff','#ff44aa','#44ffcc','#500073','#ffffff'];
 
 function _createConfettiBurst() {
-  for (let i = 0; i < 60; i++) {
+  const count = _isMobile ? 25 : 60;
+  for (let i = 0; i < count; i++) {
     const el    = document.createElement('div');
     el.className = 'confetti-piece';
     const color = _CONFETTI_COLORS[Math.floor(Math.random() * _CONFETTI_COLORS.length)];
@@ -608,13 +613,18 @@ async function startChallenge() {
 
     _initFaceMesh(videoEl, canvasEl, ctx);
 
+    const camW = _isMobile ? 480 : 640;
+    const camH = _isMobile ? 360 : 480;
+
     _camera = new Camera(videoEl, {
       onFrame: async () => {
         if (_faceMesh && videoEl.readyState >= 2) {
           await _faceMesh.send({ image: videoEl });
         }
       },
-      width: 640, height: 480,
+      width: camW,
+      height: camH,
+      facingMode: 'user',
     });
     await _camera.start();
 
