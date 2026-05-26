@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Zepto Wink Challenge - Wink Fast, Save Big!</title>
-  <meta name="description" content="Play the Zepto Wink Challenge! Wink as fast as you can in 45 seconds to earn massive discounts. Every 3 winks = 1% off your order!" />
+  <meta name="description"
+    content="Play the Zepto Wink Challenge! Wink as fast as you can in 45 seconds to earn massive discounts. Every 3 winks = 1% off your order!" />
   <link rel="icon" type="image/svg+xml" href="zepto-logo.svg" />
 
   <!-- Tailwind CSS via CDN -->
@@ -14,56 +16,56 @@
       theme: {
         extend: {
           colors: {
-            zeptoPurple:  '#500073',
-            zeptoDark:    '#2a003d',
-            zeptoDeep:    '#1a0028',
-            zeptoCoral:   '#ff5252',
-            zeptoOrange:  '#ff7043',
+            zeptoPurple: '#500073',
+            zeptoDark: '#2a003d',
+            zeptoDeep: '#1a0028',
+            zeptoCoral: '#ff5252',
+            zeptoOrange: '#ff7043',
             zeptoMagenta: '#c800ff',
-            zeptoGlow:    '#e040fb',
+            zeptoGlow: '#e040fb',
           },
           fontFamily: {
             display: ['Orbitron', 'sans-serif'],
-            body:    ['Inter', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
           },
           animation: {
-            'pulse-ring':    'pulseRing 0.6s ease-out forwards',
-            'float':         'float 3s ease-in-out infinite',
-            'shimmer':       'shimmer 2s linear infinite',
-            'bounce-in':     'bounceIn 0.5s cubic-bezier(0.68,-0.55,0.27,1.55) forwards',
+            'pulse-ring': 'pulseRing 0.6s ease-out forwards',
+            'float': 'float 3s ease-in-out infinite',
+            'shimmer': 'shimmer 2s linear infinite',
+            'bounce-in': 'bounceIn 0.5s cubic-bezier(0.68,-0.55,0.27,1.55) forwards',
             'confetti-fall': 'confettiFall 3s ease-in forwards',
-            'glow-pulse':    'glowPulse 1.5s ease-in-out infinite',
-            'count-pop':     'countPop 0.3s cubic-bezier(0.68,-0.55,0.27,1.55) forwards',
+            'glow-pulse': 'glowPulse 1.5s ease-in-out infinite',
+            'count-pop': 'countPop 0.3s cubic-bezier(0.68,-0.55,0.27,1.55) forwards',
           },
           keyframes: {
             pulseRing: {
-              '0%':   { opacity: '1', transform: 'scale(1)' },
+              '0%': { opacity: '1', transform: 'scale(1)' },
               '100%': { opacity: '0', transform: 'scale(1.12)' },
             },
             float: {
               '0%,100%': { transform: 'translateY(0px)' },
-              '50%':     { transform: 'translateY(-12px)' },
+              '50%': { transform: 'translateY(-12px)' },
             },
             shimmer: {
-              '0%':   { backgroundPosition: '-200% 0' },
+              '0%': { backgroundPosition: '-200% 0' },
               '100%': { backgroundPosition: '200% 0' },
             },
             bounceIn: {
-              '0%':   { opacity: '0', transform: 'scale(0.3)' },
-              '60%':  { opacity: '1', transform: 'scale(1.1)' },
+              '0%': { opacity: '0', transform: 'scale(0.3)' },
+              '60%': { opacity: '1', transform: 'scale(1.1)' },
               '100%': { opacity: '1', transform: 'scale(1)' },
             },
             confettiFall: {
-              '0%':   { transform: 'translateY(-100px) rotate(0deg)', opacity: '1' },
+              '0%': { transform: 'translateY(-100px) rotate(0deg)', opacity: '1' },
               '100%': { transform: 'translateY(100vh) rotate(720deg)', opacity: '0' },
             },
             glowPulse: {
               '0%,100%': { textShadow: '0 0 20px #ffffff, 0 0 40px #ffffff' },
-              '50%':     { textShadow: '0 0 40px #ffffff, 0 0 80px #ffffff, 0 0 120px rgba(255,255,255,0.8)' },
+              '50%': { textShadow: '0 0 40px #ffffff, 0 0 80px #ffffff, 0 0 120px rgba(255,255,255,0.8)' },
             },
             countPop: {
-              '0%':   { transform: 'scale(1)' },
-              '50%':  { transform: 'scale(1.35)' },
+              '0%': { transform: 'scale(1)' },
+              '50%': { transform: 'scale(1.35)' },
               '100%': { transform: 'scale(1)' },
             },
           },
@@ -75,7 +77,9 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
 
   <!-- MediaPipe Face Mesh -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
@@ -84,7 +88,11 @@
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
 
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     html {
       /* Prevent iOS bounce / overscroll */
@@ -108,10 +116,11 @@
       position: fixed;
       inset: 0;
       background: radial-gradient(ellipse at 20% 20%, #500073 0%, transparent 50%),
-                  radial-gradient(ellipse at 80% 80%, #2a003d 0%, transparent 50%),
-                  radial-gradient(ellipse at 50% 50%, #1a0028 0%, #0d001a 100%);
+        radial-gradient(ellipse at 80% 80%, #2a003d 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, #1a0028 0%, #0d001a 100%);
       z-index: 0;
     }
+
     .bg-animated::before {
       content: '';
       position: absolute;
@@ -119,9 +128,15 @@
       background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23500073' fill-opacity='0.08'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
       animation: bgDrift 20s linear infinite;
     }
+
     @keyframes bgDrift {
-      0%   { background-position: 0 0; }
-      100% { background-position: 60px 60px; }
+      0% {
+        background-position: 0 0;
+      }
+
+      100% {
+        background-position: 60px 60px;
+      }
     }
 
     /* ── Screens ── */
@@ -138,6 +153,7 @@
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
+
     .screen.hidden {
       display: none;
     }
@@ -150,15 +166,15 @@
 
     /* ── Gloss card ── */
     .gloss-card {
-      background: linear-gradient(135deg, rgba(80,0,115,0.55) 0%, rgba(42,0,61,0.75) 100%);
-      border: 1px solid rgba(255,255,255,0.15);
+      background: linear-gradient(135deg, rgba(80, 0, 115, 0.55) 0%, rgba(42, 0, 61, 0.75) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-radius: 24px;
       box-shadow:
-        0 0 0 1px rgba(255,255,255,0.06) inset,
-        0 25px 60px rgba(0,0,0,0.5),
-        0 0 80px rgba(80,0,115,0.3);
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+        0 25px 60px rgba(0, 0, 0, 0.5),
+        0 0 80px rgba(80, 0, 115, 0.3);
     }
 
     /* ── Video container ── */
@@ -166,17 +182,19 @@
       position: relative;
       border-radius: 20px;
       overflow: hidden;
-      border: 3px solid rgba(255,255,255,0.2);
-      box-shadow: 0 0 30px rgba(80,0,115,0.6), 0 0 60px rgba(80,0,115,0.3);
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 30px rgba(80, 0, 115, 0.6), 0 0 60px rgba(80, 0, 115, 0.3);
       transition: box-shadow 0.1s ease;
-      container-type: size; /* Enable container query support for child scaling */
+      container-type: size;
+      /* Enable container query support for child scaling */
     }
+
     #video-wrapper.wink-flash {
       box-shadow:
-        0 0 0 6px rgba(255,82,82,0.9),
-        0 0 40px rgba(255,82,82,0.7),
-        0 0 80px rgba(255,82,82,0.4);
-      border-color: rgba(255,82,82,0.9);
+        0 0 0 6px rgba(255, 82, 82, 0.9),
+        0 0 40px rgba(255, 82, 82, 0.7),
+        0 0 80px rgba(255, 82, 82, 0.4);
+      border-color: rgba(255, 82, 82, 0.9);
     }
 
     #webcam-video {
@@ -184,12 +202,14 @@
       height: 100%;
       object-fit: cover;
       display: block;
-      transform: scaleX(-1); /* Mirror for selfie view */
+      transform: scaleX(-1);
+      /* Mirror for selfie view */
     }
 
     #overlay-canvas {
       position: absolute;
-      top: 0; left: 0;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       pointer-events: none;
@@ -202,14 +222,15 @@
       font-weight: 900;
       color: #ffffff;
       text-shadow:
-        0 0 20px rgba(255,255,255,0.8),
-        0 0 40px rgba(255,255,255,0.5),
-        0 0 80px rgba(255,255,255,0.3);
+        0 0 20px rgba(255, 255, 255, 0.8),
+        0 0 40px rgba(255, 255, 255, 0.5),
+        0 0 80px rgba(255, 255, 255, 0.3);
       line-height: 1;
       transition: transform 0.1s ease;
     }
+
     .digital-counter.pop {
-      animation: countPop 0.3s cubic-bezier(0.68,-0.55,0.27,1.55) forwards;
+      animation: countPop 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
     }
 
     /* ── Timer bar ── */
@@ -221,19 +242,20 @@
       position: relative;
       overflow: hidden;
     }
+
     #timer-bar-fill::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%);
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
       background-size: 200% 100%;
       animation: shimmer 1.5s linear infinite;
     }
 
     /* ── Discount badge ── */
     .discount-badge {
-      background: linear-gradient(135deg, rgba(200,0,255,0.2), rgba(80,0,115,0.4));
-      border: 1px solid rgba(200,0,255,0.5);
+      background: linear-gradient(135deg, rgba(200, 0, 255, 0.2), rgba(80, 0, 115, 0.4));
+      border: 1px solid rgba(200, 0, 255, 0.5);
       border-radius: 999px;
       padding: 6px 20px;
       font-weight: 700;
@@ -253,39 +275,44 @@
       border-radius: 16px;
       padding: 18px 48px;
       font-size: 1.1rem;
-      box-shadow: 0 8px 32px rgba(255,82,82,0.5), 0 0 0 0 rgba(255,82,82,0);
+      box-shadow: 0 8px 32px rgba(255, 82, 82, 0.5), 0 0 0 0 rgba(255, 82, 82, 0);
       transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
     }
+
     .cta-btn:hover {
       transform: translateY(-3px) scale(1.02);
-      box-shadow: 0 14px 40px rgba(255,82,82,0.7), 0 0 40px rgba(255,82,82,0.3);
+      box-shadow: 0 14px 40px rgba(255, 82, 82, 0.7), 0 0 40px rgba(255, 82, 82, 0.3);
       background-position: right center;
     }
+
     .cta-btn:active {
       transform: translateY(0px) scale(0.98);
     }
+
     .cta-btn::before {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
       transform: translateX(-100%);
       transition: transform 0.4s ease;
     }
+
     .cta-btn:hover::before {
       transform: translateX(100%);
     }
 
     /* ── Coupon card ── */
     .coupon-card {
-      background: linear-gradient(135deg, rgba(255,82,82,0.05) 0%, rgba(200,0,255,0.08) 100%);
-      border: 2px dashed rgba(255,82,82,0.4);
+      background: linear-gradient(135deg, rgba(255, 82, 82, 0.05) 0%, rgba(200, 0, 255, 0.08) 100%);
+      border: 2px dashed rgba(255, 82, 82, 0.4);
       border-radius: 20px;
       position: relative;
       overflow: hidden;
     }
+
     .coupon-card::before,
     .coupon-card::after {
       content: '';
@@ -297,8 +324,14 @@
       top: 50%;
       transform: translateY(-50%);
     }
-    .coupon-card::before { left: -14px; }
-    .coupon-card::after  { right: -14px; }
+
+    .coupon-card::before {
+      left: -14px;
+    }
+
+    .coupon-card::after {
+      right: -14px;
+    }
 
     /* ── Promo code block ── */
     .promo-code {
@@ -310,22 +343,31 @@
       border-radius: 12px;
       padding: 14px 28px;
       font-size: 1.3rem;
-      box-shadow: 0 6px 24px rgba(255,82,82,0.5);
+      box-shadow: 0 6px 24px rgba(255, 82, 82, 0.5);
       cursor: pointer;
       transition: all 0.2s ease;
       user-select: all;
       position: relative;
     }
+
     .promo-code:hover {
       transform: scale(1.03);
-      box-shadow: 0 10px 35px rgba(255,82,82,0.7);
+      box-shadow: 0 10px 35px rgba(255, 82, 82, 0.7);
     }
 
     /* ── Confetti ── */
     @keyframes confettiFall {
-      0%   { transform: translateY(-100px) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+      0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
     }
+
     .confetti-piece {
       position: fixed;
       width: 10px;
@@ -342,7 +384,7 @@
       top: 12px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(255,82,82,0.9);
+      background: rgba(255, 82, 82, 0.9);
       color: #ffffff;
       font-weight: 900;
       font-size: 0.85rem;
@@ -354,6 +396,7 @@
       white-space: nowrap;
       z-index: 10;
     }
+
     #wink-indicator.show {
       opacity: 1;
     }
@@ -376,8 +419,9 @@
       white-space: nowrap;
       z-index: 10;
       pointer-events: none;
-      box-shadow: 0 2px 12px rgba(255,160,0,0.5);
+      box-shadow: 0 2px 12px rgba(255, 160, 0, 0.5);
     }
+
     #blink-warning.show {
       opacity: 1;
     }
@@ -388,16 +432,18 @@
       align-items: center;
       gap: 8px;
       font-size: 0.7rem;
-      color: rgba(255,255,255,0.7);
+      color: rgba(255, 255, 255, 0.7);
       font-family: 'Orbitron', monospace;
     }
+
     .ear-bar {
       flex: 1;
       height: 6px;
-      background: rgba(255,255,255,0.1);
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 99px;
       overflow: hidden;
     }
+
     .ear-bar-fill {
       height: 100%;
       border-radius: 99px;
@@ -423,12 +469,13 @@
       padding: 12px 28px;
       border-radius: 999px;
       font-size: 0.9rem;
-      box-shadow: 0 8px 30px rgba(255,82,82,0.5);
-      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+      box-shadow: 0 8px 30px rgba(255, 82, 82, 0.5);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
       opacity: 0;
       z-index: 10000;
       letter-spacing: 0.5px;
     }
+
     #copy-toast.show {
       transform: translateX(-50%) translateY(0);
       opacity: 1;
@@ -436,10 +483,24 @@
 
     /* ── Buzzer flash ── */
     @keyframes buzzerFlash {
-      0%,100% { opacity: 0; }
-      10%,30%,50% { opacity: 0.25; }
-      20%,40% { opacity: 0; }
+
+      0%,
+      100% {
+        opacity: 0;
+      }
+
+      10%,
+      30%,
+      50% {
+        opacity: 0.25;
+      }
+
+      20%,
+      40% {
+        opacity: 0;
+      }
     }
+
     #buzzer-overlay {
       position: fixed;
       inset: 0;
@@ -448,15 +509,22 @@
       pointer-events: none;
       opacity: 0;
     }
+
     #buzzer-overlay.flash {
       animation: buzzerFlash 0.8s ease forwards;
     }
 
     /* ── Fight start flash ── */
     @keyframes fightFlash {
-      0%   { opacity: 0.85; }
-      100% { opacity: 0; }
+      0% {
+        opacity: 0.85;
+      }
+
+      100% {
+        opacity: 0;
+      }
     }
+
     #fight-flash-overlay {
       position: fixed;
       inset: 0;
@@ -465,6 +533,7 @@
       pointer-events: none;
       opacity: 0;
     }
+
     #fight-flash-overlay.flash {
       animation: fightFlash 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
     }
@@ -476,6 +545,7 @@
       .screen {
         padding: 1rem;
       }
+
       #screen-game {
         padding: 0.5rem;
         padding-top: 0.5rem;
@@ -487,18 +557,22 @@
       .screen {
         padding: 0.75rem;
       }
+
       #screen-game {
         padding: 0.5rem;
         padding-top: 0.35rem;
       }
+
       .gloss-card {
         border-radius: 18px;
       }
+
       .cta-btn {
         padding: 14px 24px;
         font-size: 0.95rem;
         border-radius: 14px;
       }
+
       .coupon-card {
         border-radius: 16px;
       }
@@ -506,8 +580,15 @@
 
     /* Smaller phones */
     @media (max-width: 480px) {
-      .digital-counter { font-size: 4.5rem !important; }
-      .promo-code { font-size: 1rem; letter-spacing: 2px; padding: 12px 18px; }
+      .digital-counter {
+        font-size: 4.5rem !important;
+      }
+
+      .promo-code {
+        font-size: 1rem;
+        letter-spacing: 2px;
+        padding: 12px 18px;
+      }
 
       .cta-btn {
         padding: 12px 20px;
@@ -535,6 +616,7 @@
         padding: 4px 12px;
         min-width: 100px !important;
       }
+
       .discount-badge .font-display {
         font-size: 1rem !important;
       }
@@ -543,9 +625,11 @@
       #screen-welcome .gloss-card {
         padding: 1.25rem !important;
       }
+
       #screen-welcome h1 {
         font-size: 1.5rem !important;
       }
+
       #screen-welcome .text-xl {
         font-size: 1rem !important;
       }
@@ -554,9 +638,11 @@
       #screen-reward .gloss-card {
         padding: 1.25rem !important;
       }
+
       #result-discount {
         font-size: 2.5rem !important;
       }
+
       #result-wink-count {
         font-size: 3rem !important;
       }
@@ -567,6 +653,7 @@
       .screen {
         padding: 0.5rem;
       }
+
       #screen-game {
         padding: 0.35rem;
         padding-top: 0.25rem;
@@ -602,26 +689,39 @@
         justify-content: flex-start;
         padding-top: 0.25rem;
       }
+
       #video-wrapper {
         max-height: 220px !important;
       }
+
       .digital-counter {
         font-size: 3rem !important;
       }
     }
+
     @media (max-height: 600px) {
       #video-wrapper {
         max-height: 180px !important;
       }
+
       .digital-counter {
         font-size: 2.5rem !important;
       }
     }
 
     /* ── Scrollbar ── */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,82,82,0.4); border-radius: 99px; }
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 82, 82, 0.4);
+      border-radius: 99px;
+    }
 
     /* ══════════════════════════════════════════════════
        CALIBRATION OVERLAY
@@ -635,21 +735,25 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 0.5rem 1rem 36px; 
+      padding: 0.5rem 1rem 36px;
       overflow: hidden;
       background: linear-gradient(180deg,
-        rgba(15,0,25,0.88) 0%,
-        rgba(26,0,40,0.94) 100%);
+          rgba(15, 0, 25, 0.88) 0%,
+          rgba(26, 0, 40, 0.94) 100%);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
       border-radius: 20px;
       transition: opacity 0.4s ease;
     }
+
     #calib-overlay.fade-out {
       opacity: 0;
       pointer-events: none;
     }
-    #calib-overlay.hidden { display: none; }
+
+    #calib-overlay.hidden {
+      display: none;
+    }
 
 
 
@@ -657,12 +761,20 @@
     #calib-icon {
       font-size: 2.2rem;
       margin-bottom: 2px;
-      filter: drop-shadow(0 0 16px rgba(255,255,255,0.6));
+      filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.6));
       animation: floatIcon 2.5s ease-in-out infinite;
     }
+
     @keyframes floatIcon {
-      0%,100% { transform: translateY(0); }
-      50%      { transform: translateY(-8px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
     }
 
     /* Title / subtitle */
@@ -673,12 +785,13 @@
       color: #ffffff;
       text-align: center;
       letter-spacing: 1px;
-      text-shadow: 0 0 20px rgba(255,255,255,0.5);
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
       margin-bottom: 2px;
     }
+
     #calib-subtitle {
       font-size: 0.72rem;
-      color: rgba(255,255,255,0.65);
+      color: rgba(255, 255, 255, 0.65);
       text-align: center;
       max-width: 260px;
       line-height: 1.3;
@@ -692,16 +805,19 @@
       height: 64px;
       margin-bottom: 6px;
     }
+
     .calib-ring-wrap svg {
       width: 100%;
       height: 100%;
       transform: rotate(-90deg);
     }
+
     .calib-ring-bg {
       fill: none;
-      stroke: rgba(255,255,255,0.12);
+      stroke: rgba(255, 255, 255, 0.12);
       stroke-width: 6;
     }
+
     .calib-ring-fill {
       fill: none;
       stroke: #ffffff;
@@ -710,17 +826,20 @@
       stroke-dasharray: 220;
       stroke-dashoffset: 220;
       transition: stroke-dashoffset 0.12s linear,
-                  stroke 0.3s ease;
-      filter: drop-shadow(0 0 6px rgba(255,255,255,0.8));
+        stroke 0.3s ease;
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
     }
+
     .calib-ring-fill.capturing {
       stroke: #c800ff;
-      filter: drop-shadow(0 0 6px rgba(200,0,255,0.8));
+      filter: drop-shadow(0 0 6px rgba(200, 0, 255, 0.8));
     }
+
     .calib-ring-fill.success {
       stroke: #44ff88;
-      filter: drop-shadow(0 0 6px rgba(68,255,136,0.8));
+      filter: drop-shadow(0 0 6px rgba(68, 255, 136, 0.8));
     }
+
     #calib-ring-label {
       position: absolute;
       inset: 0;
@@ -729,6 +848,7 @@
       align-items: center;
       justify-content: center;
     }
+
     #calib-ring-sec {
       font-family: 'Orbitron', monospace;
       font-size: 1.05rem;
@@ -736,9 +856,10 @@
       color: #ffffff;
       line-height: 1;
     }
+
     #calib-ring-unit {
       font-size: 0.45rem;
-      color: rgba(255,255,255,0.6);
+      color: rgba(255, 255, 255, 0.6);
       letter-spacing: 1px;
     }
 
@@ -748,32 +869,36 @@
       gap: 8px;
       margin-bottom: 5px;
     }
+
     .calib-ear-pill {
       display: flex;
       align-items: center;
       gap: 5px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 999px;
       padding: 3px 10px;
       font-family: 'Orbitron', monospace;
       font-size: 0.65rem;
-      color: rgba(255,255,255,0.8);
+      color: rgba(255, 255, 255, 0.8);
       transition: border-color 0.2s, background 0.2s;
     }
+
     .calib-ear-pill .pill-label {
       font-weight: 700;
-      color: rgba(255,255,255,0.5);
+      color: rgba(255, 255, 255, 0.5);
       font-size: 0.58rem;
     }
+
     .calib-ear-pill.ear-closed {
-      border-color: rgba(255,68,68,0.6);
-      background: rgba(255,68,68,0.1);
+      border-color: rgba(255, 68, 68, 0.6);
+      background: rgba(255, 68, 68, 0.1);
       color: #ff8888;
     }
+
     .calib-ear-pill.ear-open {
-      border-color: rgba(68,255,136,0.6);
-      background: rgba(68,255,136,0.08);
+      border-color: rgba(68, 255, 136, 0.6);
+      background: rgba(68, 255, 136, 0.08);
       color: #44ff88;
     }
 
@@ -784,20 +909,22 @@
       letter-spacing: 0.8px;
       padding: 3px 10px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.25);
-      color: rgba(255,255,255,0.75);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: rgba(255, 255, 255, 0.75);
       margin-bottom: 6px;
       transition: all 0.3s ease;
     }
+
     #calib-status.success {
-      background: rgba(68,255,136,0.12);
-      border-color: rgba(68,255,136,0.5);
+      background: rgba(68, 255, 136, 0.12);
+      border-color: rgba(68, 255, 136, 0.5);
       color: #44ff88;
     }
+
     #calib-status.active {
-      background: rgba(200,0,255,0.12);
-      border-color: rgba(200,0,255,0.5);
+      background: rgba(200, 0, 255, 0.12);
+      border-color: rgba(200, 0, 255, 0.5);
       color: #e080ff;
     }
 
@@ -812,7 +939,7 @@
     /* Recalibrate button on game screen */
     #btn-recalibrate {
       font-size: 0.65rem;
-      color: rgba(255,255,255,0.4);
+      color: rgba(255, 255, 255, 0.4);
       background: none;
       border: none;
       cursor: pointer;
@@ -821,7 +948,10 @@
       font-family: 'Orbitron', monospace;
       padding: 0;
     }
-    #btn-recalibrate:hover { color: rgba(255,255,255,0.9); }
+
+    #btn-recalibrate:hover {
+      color: rgba(255, 255, 255, 0.9);
+    }
 
     /* ── Calibration bonus tip ── */
     #calib-tip {
@@ -842,11 +972,21 @@
       color: rgba(255, 220, 80, 0.95);
       letter-spacing: 0.3px;
       animation: tipPulse 2s ease-in-out infinite;
-      box-shadow: 0 0 10px rgba(255,200,0,0.12);
+      box-shadow: 0 0 10px rgba(255, 200, 0, 0.12);
     }
+
     @keyframes tipPulse {
-      0%,100% { opacity: 0.75; box-shadow: 0 0 8px  rgba(255,200,0,0.10); }
-      50%      { opacity: 1;    box-shadow: 0 0 16px rgba(255,200,0,0.28); }
+
+      0%,
+      100% {
+        opacity: 0.75;
+        box-shadow: 0 0 8px rgba(255, 200, 0, 0.10);
+      }
+
+      50% {
+        opacity: 1;
+        box-shadow: 0 0 16px rgba(255, 200, 0, 0.28);
+      }
     }
 
     /* ── Responsive calibration styles for small video heights ── */
@@ -859,34 +999,42 @@
         font-size: 1.5rem;
         margin-bottom: 0;
       }
+
       #calib-title {
         font-size: 0.8rem;
         margin-bottom: 0px;
       }
+
       #calib-subtitle {
         font-size: 0.65rem;
         margin-bottom: 3px;
         line-height: 1.1;
       }
+
       .calib-ring-wrap {
         width: 50px;
         height: 50px;
         margin-bottom: 3px;
       }
+
       #calib-ring-sec {
         font-size: 0.9rem;
       }
+
       .calib-ear-row {
         margin-bottom: 3px;
         gap: 4px;
       }
+
       .calib-ear-pill {
         padding: 2px 8px;
         font-size: 0.58rem;
       }
+
       .calib-ear-pill .pill-label {
         font-size: 0.5rem;
       }
+
       #calib-status {
         font-size: 0.58rem;
         padding: 2px 8px;
@@ -901,63 +1049,108 @@
     }
 
     /* ── Wink eye animation (welcome screen) ── */
-    .wink-eyes { display:flex; gap:18px; align-items:center; justify-content:center; margin-bottom:4px; }
+    .wink-eyes {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 4px;
+    }
+
     .wink-eye {
       position: relative;
       width: 44px;
       height: 30px;
       border-radius: 50%;
       overflow: hidden;
-      box-shadow: 0 0 18px rgba(200,0,255,0.55), 0 0 6px rgba(200,0,255,0.3);
+      box-shadow: 0 0 18px rgba(200, 0, 255, 0.55), 0 0 6px rgba(200, 0, 255, 0.3);
       background: #fff;
     }
+
     .wink-iris {
       position: absolute;
-      width: 20px; height: 20px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       background: radial-gradient(circle at 38% 38%, #7c3aed, #4c1d95 60%, #1e0040);
-      top: 50%; left: 50%;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%);
     }
+
     .wink-iris::after {
-      content:'';
-      position:absolute;
-      width:11px; height:11px;
-      border-radius:50%;
-      background:#000;
-      top:50%; left:50%;
-      transform:translate(-50%,-50%);
+      content: '';
+      position: absolute;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #000;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
+
     .wink-iris::before {
-      content:'';
-      position:absolute;
-      width:6px; height:6px;
-      border-radius:50%;
-      background:rgba(255,255,255,0.75);
-      top:18%; left:22%;
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.75);
+      top: 18%;
+      left: 22%;
     }
+
     .wink-lid {
       position: absolute;
-      top: 0; left: 0; right: 0;
+      top: 0;
+      left: 0;
+      right: 0;
       height: 100%;
       background: linear-gradient(180deg, #2a003d 60%, #500073);
       border-radius: 0 0 50% 50%;
       transform-origin: top center;
       animation: lidClose 1.6s ease-in-out infinite;
     }
-    .wink-eye.left  .wink-lid { animation-name: lidClose; animation-delay: 0s; }
-    .wink-eye.right .wink-lid { animation-name: lidClose; animation-delay: -0.8s; }
-    @keyframes lidClose {
-      0%   { transform: scaleY(0.05); }
-      30%  { transform: scaleY(1);    }
-      50%  { transform: scaleY(1);    }
-      80%  { transform: scaleY(0.05); }
-      100% { transform: scaleY(0.05); }
+
+    .wink-eye.left .wink-lid {
+      animation-name: lidClose;
+      animation-delay: 0s;
     }
+
+    .wink-eye.right .wink-lid {
+      animation-name: lidClose;
+      animation-delay: -0.8s;
+    }
+
+    @keyframes lidClose {
+      0% {
+        transform: scaleY(0.05);
+      }
+
+      30% {
+        transform: scaleY(1);
+      }
+
+      50% {
+        transform: scaleY(1);
+      }
+
+      80% {
+        transform: scaleY(0.05);
+      }
+
+      100% {
+        transform: scaleY(0.05);
+      }
+    }
+
     .wink-lid::after {
       content: '';
       position: absolute;
-      bottom: -2px; left: 10%; right: 10%;
+      bottom: -2px;
+      left: 10%;
+      right: 10%;
       height: 5px;
       border-radius: 0 0 50% 50%;
       background: #1a0028;
@@ -965,11 +1158,28 @@
 
     /* ── Pre-game countdown pop animation ── */
     @keyframes preGamePop {
-      0%   { transform: scale(0.3); opacity: 0; filter: blur(4px); }
-      50%  { transform: scale(1.35); opacity: 1; filter: blur(0px); }
-      75%  { transform: scale(0.92); }
-      100% { transform: scale(1); opacity: 1; }
+      0% {
+        transform: scale(0.3);
+        opacity: 0;
+        filter: blur(4px);
+      }
+
+      50% {
+        transform: scale(1.35);
+        opacity: 1;
+        filter: blur(0px);
+      }
+
+      75% {
+        transform: scale(0.92);
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
+
     .countdown-pop {
       animation: preGamePop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
@@ -978,313 +1188,343 @@
 
 <body>
 
-<!-- Animated background layer -->
-<div class="bg-animated"></div>
+  <!-- Animated background layer -->
+  <div class="bg-animated"></div>
 
-<!-- Buzzer flash overlay -->
-<div id="buzzer-overlay"></div>
+  <!-- Buzzer flash overlay -->
+  <div id="buzzer-overlay"></div>
 
-<!-- Fight flash overlay -->
-<div id="fight-flash-overlay"></div>
+  <!-- Fight flash overlay -->
+  <div id="fight-flash-overlay"></div>
 
-<!-- Copy toast -->
-<div id="copy-toast">✅ Code copied to clipboard!</div>
+  <!-- Copy toast -->
+  <div id="copy-toast">✅ Code copied to clipboard!</div>
 
-<!-- ════════════════════════════════════════════════════════
+  <!-- ════════════════════════════════════════════════════════
      SCREEN 1 - WELCOME
      ════════════════════════════════════════════════════════ -->
-<div id="screen-welcome" class="screen">
-  <div class="gloss-card w-full max-w-lg p-5 sm:p-8 md:p-10 text-center" style="animation: bounceIn 0.6s ease forwards;">
+  <div id="screen-welcome" class="screen">
+    <div class="gloss-card w-full max-w-lg p-5 sm:p-8 md:p-10 text-center"
+      style="animation: bounceIn 0.6s ease forwards;">
 
-    <div class="mb-4 sm:mb-6 flex flex-col items-center gap-2">
-      <!-- Zepto brand image -->
-      <img src="zepto-logo.png" alt="Zepto" class="h-16 sm:h-24 md:h-28 floating-emoji" style="animation-duration:4s; filter: drop-shadow(0px 0px 2px rgba(255,255,255,0.9)) drop-shadow(0px 0px 4px rgba(255,255,255,0.6));">
-      <!-- Alternating wink eyes -->
-      <div class="wink-eyes" style="margin-top:6px;">
-        <div class="wink-eye left">
-          <div class="wink-iris"></div>
-          <div class="wink-lid"></div>
+      <div class="mb-4 sm:mb-6 flex flex-col items-center gap-2">
+        <!-- Zepto brand image -->
+        <img src="zepto-logo.png" alt="Zepto" class="h-16 sm:h-24 md:h-28 floating-emoji"
+          style="animation-duration:4s; filter: drop-shadow(0px 0px 2px rgba(255,255,255,0.9)) drop-shadow(0px 0px 4px rgba(255,255,255,0.6));">
+        <!-- Alternating wink eyes -->
+        <div class="wink-eyes" style="margin-top:6px;">
+          <div class="wink-eye left">
+            <div class="wink-iris"></div>
+            <div class="wink-lid"></div>
+          </div>
+          <div class="wink-eye right">
+            <div class="wink-iris"></div>
+            <div class="wink-lid"></div>
+          </div>
         </div>
-        <div class="wink-eye right">
-          <div class="wink-iris"></div>
-          <div class="wink-lid"></div>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="font-display font-black text-2xl sm:text-3xl md:text-4xl leading-tight mb-2"
+        style="color:#ffffff; text-shadow: 0 0 30px rgba(255,255,255,0.5);">
+        Zepto Wink Challenge
+      </h1>
+      <p class="text-base sm:text-xl font-bold mb-4 sm:mb-6"
+        style="color: rgba(255,255,255,0.75); letter-spacing: 1px;">
+        Wink Fast, Save Big! 😉
+      </p>
+
+      <!-- Rule card -->
+      <div class="rounded-2xl p-4 sm:p-5 mb-4 sm:mb-6 text-left"
+        style="background: rgba(200,0,255,0.08); border: 1px solid rgba(200,0,255,0.3);">
+        <p class="text-white font-semibold text-sm sm:text-base mb-2 sm:mb-3 flex items-center gap-2">
+          <span class="text-xl">📋</span> Here's How It Works:
+        </p>
+        <ul class="space-y-2">
+          <li class="text-gray-300 text-sm flex items-start gap-2">
+            <span class="text-white mt-0.5">⏱</span>
+            <span>You have <strong class="text-white">45 seconds</strong> to wink .</span>
+          </li>
+          <li class="text-gray-300 text-sm flex items-start gap-2">
+            <span class="text-white mt-0.5">🎯</span>
+            <span>Each <strong class="text-white">Wink = 0.33% off</strong> your next Zepto order!</span>
+          </li>
+          <li class="text-gray-300 text-sm flex items-start gap-2">
+            <span class="text-white mt-0.5">👁️</span>
+            <span><strong class="text-white">Only single-eye winks count</strong> - double blinks are ignored!</span>
+          </li>
+          <li class="text-gray-300 text-sm flex items-start gap-2">
+            <span class="text-white mt-0.5">🏆</span>
+            <span>Now Start Winking and get: <strong class="text-white">Upto 60% Off!</strong></span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- One chance warning -->
+      <div class="rounded-xl px-4 py-3 mb-4 text-center"
+        style="background: rgba(255,82,82,0.06); border: 1px solid rgba(255,82,82,0.25);">
+        <p class="text-sm font-bold" style="color: #ffffff; letter-spacing: 0.5px;">
+          ⚡ You get only <span style="text-decoration: underline; text-underline-offset: 3px;">1 GOLDEN chance</span>
+        </p>
+      </div>
+
+      <!-- CTA -->
+      <button id="btn-start" class="cta-btn w-full text-lg" onclick="startChallenge()">
+        🚀 Start Challenge
+      </button>
+
+      <!-- Tips -->
+      <div class="rounded-xl px-4 py-3 mt-4 text-sm text-gray-400 space-y-2 text-left"
+        style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);">
+        <div class="flex items-start gap-2">
+          <span>💡</span>
+          <span><strong class="text-white">TIP :</strong> Alternate between left and right winks for maximum
+            speed!</span>
+        </div>
+        <div class="flex items-start gap-2">
+          <span>⚠️</span>
+          <span><strong class="text-white">CAUTION :</strong> Sit with the best lighting on your face to score
+            maximum!</span>
         </div>
       </div>
+
+      <!-- Camera permission note -->
+      <p class="text-xs text-gray-500 mt-3 mb-1">📷 Camera access required for face tracking. No data is stored or
+        transmitted.</p>
+
+      <!-- Error message placeholder -->
+      <p id="welcome-error" class="text-red-400 text-sm mt-2 hidden"></p>
     </div>
-
-    <!-- Headline -->
-    <h1 class="font-display font-black text-2xl sm:text-3xl md:text-4xl leading-tight mb-2" style="color:#ffffff; text-shadow: 0 0 30px rgba(255,255,255,0.5);">
-      Zepto Wink Challenge
-    </h1>
-    <p class="text-base sm:text-xl font-bold mb-4 sm:mb-6" style="color: rgba(255,255,255,0.75); letter-spacing: 1px;">
-      Wink Fast, Save Big! 😉
-    </p>
-
-    <!-- Rule card -->
-    <div class="rounded-2xl p-4 sm:p-5 mb-4 sm:mb-6 text-left" style="background: rgba(200,0,255,0.08); border: 1px solid rgba(200,0,255,0.3);">
-      <p class="text-white font-semibold text-sm sm:text-base mb-2 sm:mb-3 flex items-center gap-2">
-        <span class="text-xl">📋</span> Here's How It Works:
-      </p>
-      <ul class="space-y-2">
-        <li class="text-gray-300 text-sm flex items-start gap-2">
-          <span class="text-white mt-0.5">⏱</span>
-          <span>You have <strong class="text-white">45 seconds</strong> to wink as much as you can.</span>
-        </li>
-        <li class="text-gray-300 text-sm flex items-start gap-2">
-          <span class="text-white mt-0.5">🎯</span>
-          <span>Each <strong class="text-white">Wink = 0.33% off</strong> your next Zepto order!</span>
-        </li>
-        <li class="text-gray-300 text-sm flex items-start gap-2">
-          <span class="text-white mt-0.5">👁️</span>
-          <span><strong class="text-white">Only single-eye winks count</strong> - double blinks are ignored!</span>
-        </li>
-        <li class="text-gray-300 text-sm flex items-start gap-2">
-          <span class="text-white mt-0.5">🏆</span>
-          <span>Now Start Winking and get: <strong class="text-white">Upto 60% Off!</strong></span>
-        </li>
-      </ul>
-    </div>
-
-    <!-- One chance warning -->
-    <div class="rounded-xl px-4 py-3 mb-4 text-center" style="background: rgba(255,82,82,0.06); border: 1px solid rgba(255,82,82,0.25);">
-      <p class="text-sm font-bold" style="color: #ffffff; letter-spacing: 0.5px;">
-        ⚡ You get only <span style="text-decoration: underline; text-underline-offset: 3px;">1 GOLDEN chance</span>
-      </p>
-    </div>
-
-    <!-- CTA -->
-    <button id="btn-start" class="cta-btn w-full text-lg" onclick="startChallenge()">
-      🚀 Start Challenge
-    </button>
-
-    <!-- Tips -->
-    <div class="rounded-xl px-4 py-3 mt-4 text-sm text-gray-400 space-y-2 text-left" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);">
-      <div class="flex items-start gap-2">
-        <span>💡</span>
-        <span><strong class="text-white">TIP :</strong> Alternate between left and right winks for maximum speed!</span>
-      </div>
-      <div class="flex items-start gap-2">
-        <span>⚠️</span>
-        <span><strong class="text-white">CAUTION :</strong> Sit with the best lighting on your face to score maximum!</span>
-      </div>
-    </div>
-
-    <!-- Camera permission note -->
-    <p class="text-xs text-gray-500 mt-3 mb-1">📷 Camera access required for face tracking. No data is stored or transmitted.</p>
-
-    <!-- Error message placeholder -->
-    <p id="welcome-error" class="text-red-400 text-sm mt-2 hidden"></p>
   </div>
-</div>
 
-<!-- ════════════════════════════════════════════════════════
+  <!-- ════════════════════════════════════════════════════════
      SCREEN 2 - GAME ARENA
      ════════════════════════════════════════════════════════ -->
-<div id="screen-game" class="screen hidden" style="padding: 0.75rem;">
-  <div class="w-full max-w-lg flex flex-col gap-2 sm:gap-4">
+  <div id="screen-game" class="screen hidden" style="padding: 0.75rem;">
+    <div class="w-full max-w-lg flex flex-col gap-2 sm:gap-4">
 
-    <!-- Top bar: Logo + Timer text -->
-    <div class="flex items-center justify-between px-1">
-      <img src="zepto-logo.png" alt="Zepto" class="h-5 sm:h-6">
-      <div class="font-display font-bold text-xs sm:text-sm" style="color: rgba(255,255,255,0.7); letter-spacing:1px;">WINK CHALLENGE</div>
-      <div id="timer-text" class="font-display font-black text-lg sm:text-xl" style="color: #ffffff; text-shadow: 0 0 15px rgba(255,255,255,0.5);">45</div>
-    </div>
-
-    <!-- Timer seek bar -->
-    <div class="w-full h-2 sm:h-3 rounded-full" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);">
-      <div id="timer-bar-fill" style="width: 100%;"></div>
-    </div>
-
-    <!-- Video + Canvas -->
-    <div id="video-wrapper" class="relative w-full" style="aspect-ratio: 4/3; max-height: clamp(200px, 40vh, 340px);">
-      <video id="webcam-video" autoplay playsinline muted></video>
-      <canvas id="overlay-canvas"></canvas>
-
-      <!-- Wink indicator popup -->
-      <div id="wink-indicator">👁️ WINK!</div>
-
-      <!-- Double-blink warning -->
-      <div id="blink-warning">Wink one eye only!</div>
-
-      <!-- Distance warning overlay -->
-      <div id="distance-warning" class="hidden absolute inset-0 z-[100] flex-col items-center justify-center text-white text-center backdrop-blur-md rounded-[20px]" style="background: rgba(255,82,82,0.85);">
-        <div class="text-6xl mb-2">👀</div>
-        <h2 class="font-display font-black text-2xl sm:text-3xl leading-tight text-white">MOVE CLOSER</h2>
-        <p class="font-bold text-sm mt-1 text-white">Your face is too far from the camera</p>
+      <!-- Top bar: Logo + Timer text -->
+      <div class="flex items-center justify-between px-1">
+        <img src="zepto-logo.png" alt="Zepto" class="h-5 sm:h-6">
+        <div class="font-display font-bold text-xs sm:text-sm"
+          style="color: rgba(255,255,255,0.7); letter-spacing:1px;">WINK CHALLENGE</div>
+        <div id="timer-text" class="font-display font-black text-lg sm:text-xl"
+          style="color: #ffffff; text-shadow: 0 0 15px rgba(255,255,255,0.5);">45</div>
       </div>
 
-      <!-- Eye Blocked / Out of frame warning -->
-      <div id="block-warning" class="hidden absolute inset-0 z-[100] flex-col items-center justify-center text-white text-center backdrop-blur-md rounded-[20px]" style="background: rgba(255,140,0,0.85);">
-        <div class="text-6xl mb-2">✋</div>
-        <h2 class="font-display font-black text-2xl sm:text-3xl leading-tight text-white">EYES BLOCKED</h2>
-        <p class="font-bold text-sm mt-1 text-white">Please keep both eyes clearly visible in the frame</p>
+      <!-- Timer seek bar -->
+      <div class="w-full h-2 sm:h-3 rounded-full"
+        style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);">
+        <div id="timer-bar-fill" style="width: 100%;"></div>
       </div>
 
-      <!-- ── Pre-game Countdown Overlay ── -->
-      <div id="countdown-overlay" class="hidden absolute inset-0 z-40 flex flex-col items-center justify-center backdrop-blur-sm rounded-[20px]" style="background: rgba(15,0,25,0.68);">
-        <div class="countdown-circle-wrap relative w-24 h-24 flex items-center justify-center">
-          <!-- Premium glowing loader ring -->
-          <svg class="absolute inset-0 animate-spin" width="96" height="96" viewBox="0 0 96 96" style="animation-duration: 2s;">
-            <circle cx="48" cy="48" r="42" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="4"/>
-            <circle cx="48" cy="48" r="42" fill="none" stroke="url(#countdown-grad)" stroke-width="4" stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="180"/>
-            <defs>
-              <linearGradient id="countdown-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#ff5252"/>
-                <stop offset="100%" stop-color="#c800ff"/>
-              </linearGradient>
-            </defs>
-          </svg>
-          <!-- Giant glowing countdown text -->
-          <div id="countdown-number" class="font-display font-black text-2xl text-white countdown-pop" style="text-shadow: 0 0 20px rgba(200,0,255,0.8);">READY</div>
+      <!-- Video + Canvas -->
+      <div id="video-wrapper" class="relative w-full" style="aspect-ratio: 4/3; max-height: clamp(200px, 40vh, 340px);">
+        <video id="webcam-video" autoplay playsinline muted></video>
+        <canvas id="overlay-canvas"></canvas>
+
+        <!-- Wink indicator popup -->
+        <div id="wink-indicator">👁️ WINK!</div>
+
+        <!-- Double-blink warning -->
+        <div id="blink-warning">Wink one eye only!</div>
+
+        <!-- Distance warning overlay -->
+        <div id="distance-warning"
+          class="hidden absolute inset-0 z-[100] flex-col items-center justify-center text-white text-center backdrop-blur-md rounded-[20px]"
+          style="background: rgba(255,82,82,0.85);">
+          <div class="text-6xl mb-2">👀</div>
+          <h2 class="font-display font-black text-2xl sm:text-3xl leading-tight text-white">MOVE CLOSER</h2>
+          <p class="font-bold text-sm mt-1 text-white">Your face is too far from the camera</p>
         </div>
-        <div id="countdown-label" class="mt-4 font-display font-bold text-xs uppercase tracking-widest text-white/70">WINK CHALLENGE STARTING</div>
+
+        <!-- Eye Blocked / Out of frame warning -->
+        <div id="block-warning"
+          class="hidden absolute inset-0 z-[100] flex-col items-center justify-center text-white text-center backdrop-blur-md rounded-[20px]"
+          style="background: rgba(255,140,0,0.85);">
+          <div class="text-6xl mb-2">✋</div>
+          <h2 class="font-display font-black text-2xl sm:text-3xl leading-tight text-white">EYES BLOCKED</h2>
+          <p class="font-bold text-sm mt-1 text-white">Please keep both eyes clearly visible in the frame</p>
+        </div>
+
+        <!-- ── Pre-game Countdown Overlay ── -->
+        <div id="countdown-overlay"
+          class="hidden absolute inset-0 z-40 flex flex-col items-center justify-center backdrop-blur-sm rounded-[20px]"
+          style="background: rgba(15,0,25,0.68);">
+          <div class="countdown-circle-wrap relative w-24 h-24 flex items-center justify-center">
+            <!-- Premium glowing loader ring -->
+            <svg class="absolute inset-0 animate-spin" width="96" height="96" viewBox="0 0 96 96"
+              style="animation-duration: 2s;">
+              <circle cx="48" cy="48" r="42" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="4" />
+              <circle cx="48" cy="48" r="42" fill="none" stroke="url(#countdown-grad)" stroke-width="4"
+                stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="180" />
+              <defs>
+                <linearGradient id="countdown-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ff5252" />
+                  <stop offset="100%" stop-color="#c800ff" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <!-- Giant glowing countdown text -->
+            <div id="countdown-number" class="font-display font-black text-2xl text-white countdown-pop"
+              style="text-shadow: 0 0 20px rgba(200,0,255,0.8);">READY</div>
+          </div>
+          <div id="countdown-label" class="mt-4 font-display font-bold text-xs uppercase tracking-widest text-white/70">
+            WINK CHALLENGE STARTING</div>
+        </div>
+
+        <!-- ── Calibration Overlay (lives INSIDE video-wrapper so it sits over the feed) ── -->
+        <div id="calib-overlay" class="hidden">
+
+
+
+          <!-- Icon -->
+          <div id="calib-icon">👁️</div>
+
+          <!-- Title -->
+          <div id="calib-title">CALIBRATING…</div>
+
+          <!-- Subtitle -->
+          <div id="calib-subtitle">MOVE <span class="calib-highlight">closer to the CAMERA</span> with <span
+              class="calib-highlight">BOTH eyes NATURALLYopen</span> for better calibration</div>
+
+          <!-- Countdown ring -->
+          <div class="calib-ring-wrap">
+            <svg width="80" height="80" viewBox="0 0 80 80">
+              <circle class="calib-ring-bg" cx="40" cy="40" r="35" />
+              <circle class="calib-ring-fill" id="calib-ring-fill" cx="40" cy="40" r="35" />
+            </svg>
+            <div id="calib-ring-label">
+              <span id="calib-ring-sec">2</span>
+              <span id="calib-ring-unit">SEC</span>
+            </div>
+          </div>
+
+          <!-- Live EAR readout -->
+          <div class="calib-ear-row">
+            <div class="calib-ear-pill" id="calib-pill-left">
+              <span class="pill-label">L</span>
+              <span id="calib-ear-left">-</span>
+            </div>
+            <div class="calib-ear-pill" id="calib-pill-right">
+              <span class="pill-label">R</span>
+              <span id="calib-ear-right">-</span>
+            </div>
+          </div>
+
+          <!-- Status -->
+          <div id="calib-status">⏳ Waiting for face…</div>
+
+
+
+          <!-- Bonus tip -->
+          <span>🧿</span>
+          <div id="calib-tip">BONUS TIP: Move Closer to the Cam for better accuracy</div>
+        </div>
+        <!-- ── End Calibration Overlay ── -->
       </div>
 
-      <!-- ── Calibration Overlay (lives INSIDE video-wrapper so it sits over the feed) ── -->
-      <div id="calib-overlay" class="hidden">
 
+      <!-- Live wink count -->
+      <div class="gloss-card p-3 sm:p-4 text-center">
+        <p class="text-xs font-semibold mb-1 uppercase tracking-widest" style="color: rgba(255,255,255,0.5);">Wink Count
+        </p>
+        <div id="wink-count-display" class="digital-counter text-5xl sm:text-7xl md:text-8xl">0</div>
+      </div>
 
-
-        <!-- Icon -->
-        <div id="calib-icon">👁️</div>
-
-        <!-- Title -->
-        <div id="calib-title">CALIBRATING…</div>
-
-        <!-- Subtitle -->
-        <div id="calib-subtitle">MOVE <span class="calib-highlight">closer to the CAMERA</span> with <span class="calib-highlight">BOTH eyes wide open</span> as much as you can for better calibration</div>
-
-        <!-- Countdown ring -->
-        <div class="calib-ring-wrap">
-          <svg width="80" height="80" viewBox="0 0 80 80">
-            <circle class="calib-ring-bg" cx="40" cy="40" r="35"/>
-            <circle class="calib-ring-fill" id="calib-ring-fill" cx="40" cy="40" r="35"/>
-          </svg>
-          <div id="calib-ring-label">
-            <span id="calib-ring-sec">2</span>
-            <span id="calib-ring-unit">SEC</span>
+      <!-- EAR debug bars + Discount badge row -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- EAR indicators -->
+        <div class="flex-1 gloss-card px-2 sm:px-3 py-2 space-y-1.5 min-w-0">
+          <div class="ear-bar-wrap">
+            <span style="color: rgba(255,255,255,0.6); min-width: 18px;">L</span>
+            <div class="ear-bar">
+              <div id="ear-bar-left" class="ear-bar-fill" style="width: 50%;"></div>
+            </div>
+            <span id="ear-val-left" style="color: rgba(255,255,255,0.7); min-width: 32px;">0.3</span>
+          </div>
+          <div class="ear-bar-wrap">
+            <span style="color: rgba(255,255,255,0.6); min-width: 18px;">R</span>
+            <div class="ear-bar">
+              <div id="ear-bar-right" class="ear-bar-fill" style="width: 50%;"></div>
+            </div>
+            <span id="ear-val-right" style="color: rgba(255,255,255,0.7); min-width: 32px;">0.3</span>
           </div>
         </div>
 
-        <!-- Live EAR readout -->
-        <div class="calib-ear-row">
-          <div class="calib-ear-pill" id="calib-pill-left">
-            <span class="pill-label">L</span>
-            <span id="calib-ear-left">-</span>
-          </div>
-          <div class="calib-ear-pill" id="calib-pill-right">
-            <span class="pill-label">R</span>
-            <span id="calib-ear-right">-</span>
-          </div>
-        </div>
-
-        <!-- Status -->
-        <div id="calib-status">⏳ Waiting for face…</div>
-
-
-
-        <!-- Bonus tip -->
-         <span>🧿</span>
-        <div id="calib-tip">BONUS TIP: Move Closer to the Cam for better accuracy</div>
-      </div>
-      <!-- ── End Calibration Overlay ── -->
-    </div>
-
-
-    <!-- Live wink count -->
-    <div class="gloss-card p-3 sm:p-4 text-center">
-      <p class="text-xs font-semibold mb-1 uppercase tracking-widest" style="color: rgba(255,255,255,0.5);">Wink Count</p>
-      <div id="wink-count-display" class="digital-counter text-5xl sm:text-7xl md:text-8xl">0</div>
-    </div>
-
-    <!-- EAR debug bars + Discount badge row -->
-    <div class="flex items-center gap-2 sm:gap-3">
-      <!-- EAR indicators -->
-      <div class="flex-1 gloss-card px-2 sm:px-3 py-2 space-y-1.5 min-w-0">
-        <div class="ear-bar-wrap">
-          <span style="color: rgba(255,255,255,0.6); min-width: 18px;">L</span>
-          <div class="ear-bar">
-            <div id="ear-bar-left" class="ear-bar-fill" style="width: 50%;"></div>
-          </div>
-          <span id="ear-val-left" style="color: rgba(255,255,255,0.7); min-width: 32px;">0.3</span>
-        </div>
-        <div class="ear-bar-wrap">
-          <span style="color: rgba(255,255,255,0.6); min-width: 18px;">R</span>
-          <div class="ear-bar">
-            <div id="ear-bar-right" class="ear-bar-fill" style="width: 50%;"></div>
-          </div>
-          <span id="ear-val-right" style="color: rgba(255,255,255,0.7); min-width: 32px;">0.3</span>
+        <!-- Discount badge -->
+        <div class="discount-badge text-center shrink-0" style="color: #ffffff; min-width: 100px;">
+          <div class="text-xs opacity-70 uppercase tracking-widest font-semibold">Discount</div>
+          <div id="live-discount" class="font-display font-black text-lg sm:text-xl">0% Off</div>
         </div>
       </div>
 
-      <!-- Discount badge -->
-      <div class="discount-badge text-center shrink-0" style="color: #ffffff; min-width: 100px;">
-        <div class="text-xs opacity-70 uppercase tracking-widest font-semibold">Discount</div>
-        <div id="live-discount" class="font-display font-black text-lg sm:text-xl">0% Off</div>
+      <!-- Status text + recalibrate -->
+      <div class="flex items-center justify-between gap-2">
+        <div id="tracking-status" class="text-xs font-semibold uppercase tracking-widest flex-1"
+          style="color: rgba(255,255,255,0.4);">
+          🔍 Initializing face tracking…
+        </div>
+        <button id="btn-recalibrate" onclick="restartCalibration()" style="display:none;">
+          ↻ RECALIBRATE
+        </button>
       </div>
-    </div>
 
-    <!-- Status text + recalibrate -->
-    <div class="flex items-center justify-between gap-2">
-      <div id="tracking-status" class="text-xs font-semibold uppercase tracking-widest flex-1" style="color: rgba(255,255,255,0.4);">
-        🔍 Initializing face tracking…
-      </div>
-      <button id="btn-recalibrate" onclick="restartCalibration()" style="display:none;">
-        ↻ RECALIBRATE
-      </button>
     </div>
-
   </div>
-</div>
 
-<!-- ════════════════════════════════════════════════════════
+  <!-- ════════════════════════════════════════════════════════
      SCREEN 3 - REWARD / RESULTS
      ════════════════════════════════════════════════════════ -->
-<div id="screen-reward" class="screen hidden">
-  <div class="gloss-card w-full max-w-lg p-5 sm:p-8 text-center" style="animation: bounceIn 0.6s ease forwards;">
+  <div id="screen-reward" class="screen hidden">
+    <div class="gloss-card w-full max-w-lg p-5 sm:p-8 text-center" style="animation: bounceIn 0.6s ease forwards;">
 
-    <!-- Header -->
-    <div class="mb-4">
-      <img src="zepto-logo.png" alt="Zepto" class="h-10 mx-auto mb-3">
-      <div class="text-4xl mb-2">🎉</div>
-      <h2 class="font-display font-black text-2xl sm:text-3xl" style="color: #ffffff;">
-        Challenge Complete!
-      </h2>
-      <p class="text-gray-300 text-sm mt-1">Here's what you won:</p>
-    </div>
-
-    <!-- Score summary -->
-    <div class="rounded-2xl px-6 py-4 mb-4" style="background: rgba(200,0,255,0.1); border: 1px solid rgba(200,0,255,0.3);">
-      <p class="text-gray-400 text-sm mb-1">Total Winks</p>
-      <div id="result-wink-count" class="font-display font-black text-5xl" style="color: #c800ff; text-shadow: 0 0 30px rgba(200,0,255,0.8);">0</div>
-      <p class="text-gray-400 text-sm mt-1">winks recorded</p>
-    </div>
-
-    <!-- Coupon card -->
-    <div class="coupon-card p-6 mb-6">
-      <p class="text-gray-400 text-xs uppercase tracking-widest mb-2 font-semibold">Your Exclusive Discount</p>
-      <div id="result-discount" class="font-display font-black mb-1" style="font-size: 3.5rem; color: #ffffff; text-shadow: 0 0 30px rgba(255,255,255,0.7), 0 0 60px rgba(255,255,255,0.4);">
-        0% OFF
+      <!-- Header -->
+      <div class="mb-4">
+        <img src="zepto-logo.png" alt="Zepto" class="h-10 mx-auto mb-3">
+        <div class="text-4xl mb-2">🎉</div>
+        <h2 class="font-display font-black text-2xl sm:text-3xl" style="color: #ffffff;">
+          Challenge Complete!
+        </h2>
+        <p class="text-gray-300 text-sm mt-1">Here's what you won:</p>
       </div>
 
-      <p class="text-gray-400 text-xs mb-2 font-semibold uppercase tracking-widest">Promo Code - Tap to Copy</p>
-      <div id="promo-code-display" class="promo-code" onclick="copyPromoCode()">ZEPTOWINK0</div>
-      <p class="text-gray-500 text-xs mt-2">Valid for 24 hours on Zepto app</p>
+      <!-- Score summary -->
+      <div class="rounded-2xl px-6 py-4 mb-4"
+        style="background: rgba(200,0,255,0.1); border: 1px solid rgba(200,0,255,0.3);">
+        <p class="text-gray-400 text-sm mb-1">Total Winks</p>
+        <div id="result-wink-count" class="font-display font-black text-5xl"
+          style="color: #c800ff; text-shadow: 0 0 30px rgba(200,0,255,0.8);">0</div>
+        <p class="text-gray-400 text-sm mt-1">winks recorded</p>
+      </div>
+
+      <!-- Coupon card -->
+      <div class="coupon-card p-6 mb-6">
+        <p class="text-gray-400 text-xs uppercase tracking-widest mb-2 font-semibold">Your Exclusive Discount</p>
+        <div id="result-discount" class="font-display font-black mb-1"
+          style="font-size: 3.5rem; color: #ffffff; text-shadow: 0 0 30px rgba(255,255,255,0.7), 0 0 60px rgba(255,255,255,0.4);">
+          0% OFF
+        </div>
+
+        <p class="text-gray-400 text-xs mb-2 font-semibold uppercase tracking-widest">Promo Code - Tap to Copy</p>
+        <div id="promo-code-display" class="promo-code" onclick="copyPromoCode()">ZEPTOWINK0</div>
+        <p class="text-gray-500 text-xs mt-2">Valid for 24 hours on Zepto app</p>
+      </div>
+
+      <!-- CTA buttons -->
+      <button class="cta-btn w-full" onclick="copyPromoCode()">
+        📋 Copy Code to App
+      </button>
+
     </div>
-
-    <!-- CTA buttons -->
-    <button class="cta-btn w-full" onclick="copyPromoCode()">
-      📋 Copy Code to App
-    </button>
-
   </div>
-</div>
 
-<!-- ════════════════════════════════════════════════════════
+  <!-- ════════════════════════════════════════════════════════
      MODULAR SCRIPTS (order matters: calibration before tracking)
      ════════════════════════════════════════════════════════ -->
-<script src="calibration.js"></script>
-<script src="tracking.js"></script>
+  <script src="calibration.js"></script>
+  <script src="tracking.js"></script>
 
 </body>
+
 </html>

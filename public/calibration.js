@@ -13,7 +13,7 @@ const RING_CIRC = 2 * Math.PI * 35; // ≈ 219.9
 const CALIB_STEP_META = [
   {
     dotIdx: 0, icon: '👀', title: 'EYE CALIBRATION',
-    subtitle: 'MOVE <span class="calib-highlight">closer to the CAMERA</span> with <span class="calib-highlight">BOTH eyes wide open</span> as much as you can for better calibration',
+    subtitle: 'MOVE <span class="calib-highlight">closer to the CAMERA</span> with <span class="calib-highlight">BOTH eyes NATURALLYopen</span>  for better calibration',
     durationMs: 3500,
   },
 ];
@@ -28,8 +28,8 @@ const _calibInternal = {
 
 // ─── Public profile (set after calibration completes / on skip) ───────────────
 window.userProfile = {
-  leftMin:  0.18,   // default fallback values
-  leftMax:  0.32,
+  leftMin: 0.18,   // default fallback values
+  leftMax: 0.32,
   rightMin: 0.18,
   rightMax: 0.32,
   calibrated: false,
@@ -46,7 +46,7 @@ function _setCalibDot(activeIdx) {
     const dot = _dom(`cdot-${i}`);
     if (!dot) continue;
     dot.className = 'calib-dot';
-    if (i < activeIdx)  dot.classList.add('done');
+    if (i < activeIdx) dot.classList.add('done');
     if (i === activeIdx) dot.classList.add('active');
   }
 }
@@ -67,12 +67,12 @@ function _updateCalibRing(progress /* 0–1 */) {
 function _updateCalibEarPills(lEAR, rEAR) {
   const elL = _dom('calib-ear-left');
   const elR = _dom('calib-ear-right');
-  const pL  = _dom('calib-pill-left');
-  const pR  = _dom('calib-pill-right');
+  const pL = _dom('calib-pill-left');
+  const pR = _dom('calib-pill-right');
   if (elL) elL.textContent = lEAR.toFixed(3);
   if (elR) elR.textContent = rEAR.toFixed(3);
-  if (pL)  pL.className   = 'calib-ear-pill ear-open';
-  if (pR)  pR.className   = 'calib-ear-pill ear-open';
+  if (pL) pL.className = 'calib-ear-pill ear-open';
+  if (pR) pR.className = 'calib-ear-pill ear-open';
 }
 
 // ─── Phase runner ─────────────────────────────────────────────────────────────
@@ -83,14 +83,14 @@ function _runCalibPhase(stepIdx, phaseId) {
 
     _setCalibDot(stepIdx);
 
-    const icon     = _dom('calib-icon');
-    const title    = _dom('calib-title');
+    const icon = _dom('calib-icon');
+    const title = _dom('calib-title');
     const subtitle = _dom('calib-subtitle');
-    const sec      = _dom('calib-ring-sec');
-    const fill     = _dom('calib-ring-fill');
+    const sec = _dom('calib-ring-sec');
+    const fill = _dom('calib-ring-fill');
 
-    if (icon)     icon.textContent   = meta.icon;
-    if (title)    title.textContent  = meta.title;
+    if (icon) icon.textContent = meta.icon;
+    if (title) title.textContent = meta.title;
     if (subtitle) subtitle.innerHTML = meta.subtitle;
 
     let timeLeftMs = meta.durationMs;
@@ -138,12 +138,12 @@ function _finishCalibration() {
   // New formula: open - 0.13 gives a reliable ~40 % of open-eye EAR as floor.
   const CLOSE_DROP = 0.13;
   window.userProfile = {
-    leftMin:    Math.max(lOpen - CLOSE_DROP, 0.08),  // floor at 0.08
-    leftMax:    lOpen,
-    rightMin:   Math.max(rOpen - CLOSE_DROP, 0.08),
-    rightMax:   rOpen,
-    leftOpen:   lOpen,   // raw reference kept for asymmetry guard
-    rightOpen:  rOpen,
+    leftMin: Math.max(lOpen - CLOSE_DROP, 0.08),  // floor at 0.08
+    leftMax: lOpen,
+    rightMin: Math.max(rOpen - CLOSE_DROP, 0.08),
+    rightMax: rOpen,
+    leftOpen: lOpen,   // raw reference kept for asymmetry guard
+    rightOpen: rOpen,
     calibrated: true,
   };
 
@@ -173,9 +173,9 @@ function onCalibFrame(lEAR, rEAR) {
  * Full calibration wizard. Resolves when the overlay is dismissed.
  */
 async function startCalibration() {
-  _calibInternal.active       = true;
-  _calibInternal.phase        = 'idle';
-  _calibInternal.leftSamples  = [];
+  _calibInternal.active = true;
+  _calibInternal.phase = 'idle';
+  _calibInternal.leftSamples = [];
   _calibInternal.rightSamples = [];
   window.userProfile.calibrated = false;
   window._calibFaceReady = false;
@@ -221,7 +221,7 @@ async function startCalibration() {
  */
 function skipCalibration() {
   _calibInternal.active = false;
-  _calibInternal.phase  = 'idle';
+  _calibInternal.phase = 'idle';
   // Keep defaults already set on window.userProfile
   window.userProfile.calibrated = false;
 
@@ -266,8 +266,8 @@ function isCalibActive() {
 }
 
 // ─── Expose globals for HTML onclick= handlers ────────────────────────────────
-window.startCalibration    = startCalibration;
-window.skipCalibration     = skipCalibration;
-window.restartCalibration  = restartCalibration;
-window.onCalibFrame        = onCalibFrame;
-window.isCalibActive       = isCalibActive;
+window.startCalibration = startCalibration;
+window.skipCalibration = skipCalibration;
+window.restartCalibration = restartCalibration;
+window.onCalibFrame = onCalibFrame;
+window.isCalibActive = isCalibActive;
