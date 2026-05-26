@@ -187,6 +187,11 @@ let _blinkWarningTimer = null;
 let _blinkWarningLastTs = 0;
 const DOUBLE_BLINK_COOLDOWN_MS = 800;
 
+// Lockout: after a bilateral blink is detected, suppress all wink credits
+// for this many ms to prevent blink-recovery asymmetry from counting as a wink.
+let _lastBlinkTs = 0;
+const BLINK_LOCKOUT_MS = 350;
+
 function _triggerDoubleBlink() {
   const now = Date.now();
   if (now - _blinkWarningLastTs < DOUBLE_BLINK_COOLDOWN_MS) return;
@@ -217,13 +222,24 @@ function _processEARs(lEAR, rEAR) {
 
   const now = Date.now();
 
-  // ── Bilateral blink guard (PATH 1) ───────────────────────────────────────
-  // With the fixed calibration (absolute drop), lerpScore is reliable again.
-  // If BOTH eyes score low simultaneously → double blink, no wink credit.
+  // ── Bilateral blink guard ────────────────────────────────────────────────
+  // Both eyes scoring low simultaneously = double blink.
+  // Also starts a BLINK_LOCKOUT_MS window: any wink rising-edge during blink
+  // recovery (when one eye opens faster than the other) is suppressed.
   if (leftScore < WINK_SCORE_ACTIVE && rightScore < WINK_SCORE_ACTIVE) {
     _eyeState.left.wasWinking  = false;
     _eyeState.right.wasWinking = false;
+    _lastBlinkTs = now;            // ← start lockout clock
     _triggerDoubleBlink();
+    return;
+  }
+
+  // Still inside blink lockout? Reset any stale wasWinking flags and bail.
+  // This blocks the blink-recovery loophole where PATH 1 sets wasWinking=true
+  // as one eye opens faster, then counts a wink when the other follows.
+  if (now - _lastBlinkTs < BLINK_LOCKOUT_MS) {
+    _eyeState.left.wasWinking  = false;
+    _eyeState.right.wasWinking = false;
     return;
   }
 
